@@ -615,7 +615,7 @@ public class SnippetsUsers extends Snippets{
                     Log.i(TAG, "currentPage: " + params.getInt(Consts.CURR_PAGE));
                     Log.i(TAG, "perPage: " + params.getInt(Consts.PER_PAGE));
                     Log.i(TAG, "totalEntries: " + params.getInt(Consts.TOTAL_ENTRIES));
-                    Log.i(TAG, "totalPages: " + params.getInt(Consts.TOTAL_PAGES));
+//                    Log.i(TAG, "totalPages: " + params.getInt(Consts.TOTAL_PAGES));
                 }
 
                 @Override

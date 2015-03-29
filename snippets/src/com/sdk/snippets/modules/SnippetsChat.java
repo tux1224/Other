@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.quickblox.chat.QBChat;
 import com.quickblox.chat.listeners.QBGroupChatManagerListener;
+import com.quickblox.chat.listeners.QBMessageSentListener;
 import com.quickblox.chat.listeners.QBParticipantListener;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -94,6 +96,8 @@ public class SnippetsChat extends Snippets {
     //
     private QBGroupChat currentChatRoom;
 
+    private QBMessageSentListener messageSentListener;
+
     // Roster
     //
     private QBRoster сhatRoster;
@@ -129,6 +133,8 @@ public class SnippetsChat extends Snippets {
 
         // Init Chat service
         initChatService();
+
+        initSentMessageListener();
 
         // Init 1-1 listeners
         initPrivateChatMessageListener();
@@ -235,6 +241,7 @@ public class SnippetsChat extends Snippets {
             log("Initializing chat");
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
+            chatService.setUseStreamManagement(true);
             chatService.addConnectionListener(chatConnectionListener);
         }
     }
@@ -251,6 +258,8 @@ public class SnippetsChat extends Snippets {
                     Log.i(TAG, "adding message listener to new chat");
                     privateChat.addMessageListener(privateChatMessageListener);
                     privateChat.addIsTypingListener(privateChatIsTypingListener);
+
+                    privateChat.addMessageSentListener(messageSentListener);
                 }
 
                 log("Private chat created: " + privateChat + ", createdLocally: " + createdLocally);
@@ -427,8 +436,8 @@ public class SnippetsChat extends Snippets {
         }
 
         @Override
-        public void authenticated(XMPPConnection connection) {
-            log("authenticated");
+        public void authenticated(XMPPConnection connection, boolean resumed) {
+            log("authenticated, resumed: " + resumed);
         }
 
         @Override
@@ -513,6 +522,20 @@ public class SnippetsChat extends Snippets {
             log("carbons enabled: " + isEnabled);
         }
     };
+
+    private void initSentMessageListener(){
+        messageSentListener = new QBMessageSentListener() {
+            @Override
+            public void processMessageSent(QBChat qbChat, QBChatMessage qbChatMessage) {
+                log("processMessageSent");
+            }
+
+            @Override
+            public void processMessageFailed(QBChat qbChat, QBChatMessage qbChatMessage) {
+                log("processMessageFailed");
+            }
+        };
+    }
 
 
     //
@@ -599,10 +622,10 @@ public class SnippetsChat extends Snippets {
                 if (privateChat == null) {
                     privateChat = privateChatManager.createChat(ApplicationConfig.getInstance().getTestUserId2(), privateChatMessageListener);
                     privateChat.addIsTypingListener(privateChatIsTypingListener);
+
+                    privateChat.addMessageSentListener(messageSentListener);
                 }
                 privateChat.sendMessage(chatMessage);
-            } catch (XMPPException e) {
-                log("send message error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("send message error: " + e.getClass().getSimpleName());
             }
@@ -630,8 +653,6 @@ public class SnippetsChat extends Snippets {
             }
             try {
                 privateChat.sendIsTypingNotification();
-            } catch (XMPPException e) {
-                log("send typing error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("send typing error: " + e.getClass().getSimpleName());
             }
@@ -653,8 +674,6 @@ public class SnippetsChat extends Snippets {
             }
             try {
                 privateChat.sendStopTypingNotification();
-            } catch (XMPPException e) {
-                log("send stop typing error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("send stop typing error: " + e.getClass().getSimpleName());
             }
@@ -676,8 +695,6 @@ public class SnippetsChat extends Snippets {
             }
             try {
                 privateChat.readMessage(null);
-            } catch (XMPPException e) {
-                log("read message error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("read message error: " + e.getClass().getSimpleName());
             }
@@ -745,6 +762,8 @@ public class SnippetsChat extends Snippets {
                     // add listeners
                     currentChatRoom.addMessageListener(groupChatMessageListener);
                     currentChatRoom.addParticipantListener(participantListener);
+
+                    currentChatRoom.addMessageSentListener(messageSentListener);
                 }
 
                 @Override
@@ -829,8 +848,6 @@ public class SnippetsChat extends Snippets {
 
             try {
                 currentChatRoom.sendMessage(chatMessage);
-            } catch (XMPPException e) {
-                log("Send message error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("Send message error: " + e.getClass().getSimpleName());
             } catch (IllegalStateException e){
@@ -854,8 +871,6 @@ public class SnippetsChat extends Snippets {
 
             try {
                 currentChatRoom.sendMessageWithoutJoin(chatMessage);
-            } catch (XMPPException e) {
-                log("Send message error: " + e.getLocalizedMessage());
             } catch (SmackException.NotConnectedException e) {
                 log("Send message error: " + e.getClass().getSimpleName());
             } catch (IllegalStateException e){
