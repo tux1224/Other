@@ -8,11 +8,22 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        maven {
+            url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+        }
+    }
+}
+
 ext.compileSdkVersion = 21
 ext.buildToolsVersion = "21.1.1"
 
 ext.minSdkVersion = 14
 ext.targetSdkVersion = 19
+
+ext.androidSupportVersion = "22.1.0"
+ext.playServiceVersion = "7.0.0"
 
 ext.sourceCompatibility = JavaVersion.VERSION_1_7
 ext.targetCompatibility = JavaVersion.VERSION_1_7

@@ -14,8 +14,9 @@ android {
 }
 
 dependencies {
-    compile files('../jars/quickblox-android-sdk-core-2.2.1.jar', '../jars/quickblox-android-sdk-location-2.2.1.jar')
-    compile 'com.android.support:support-v4:19.0.0'
-    compile 'com.android.support:appcompat-v7:19.0.0'
-    compile 'com.google.android.gms:play-services:3.2.+'
+    compile 'com.quickblox:quickblox-android-sdk-core:2.2.1@jar'
+    compile 'com.quickblox:quickblox-android-sdk-location:2.2.1@jar'
+    compile "com.android.support:support-v4:$rootProject.androidSupportVersion"
+    compile "com.android.support:appcompat-v7:$rootProject.androidSupportVersion"
+    compile "com.google.android.gms:play-services:$rootProject.playServiceVersion"
 }
