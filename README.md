@@ -9,9 +9,15 @@ This project contains QuickBlox Android SDK, that includes
 
 ## How to start
 
-To start work you should just put library jar into your project and call desired methods.
+To start work you should add framework repository via maven in your app build script 
+```bash
+repositories {
+        maven {
+            url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+        }
+    }
+```
 
-Latest jar-packed framework file you can download from [downloads page](https://github.com/QuickBlox/quickblox-android-sdk/downloads).
 
 ## Documentation
 
@@ -28,7 +34,12 @@ Android SDK is really simple to use. Just in few minutes you can power your mobi
 * [How to get app credentials](http://quickblox.com/developers/Getting_application_credentials)
 
 ### 2. Create new Android project
-### 3. Add [jar library](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/jar) to project libs folder.
+### 3. Add module dependency in gradle build script
+```bash
+compile 'com.quickblox:qb-module:qb-version'
+like
+compile 'com.quickblox:quickblox-android-sdk-core:2.2.1'
+```
 Eclipse users: If you got 'Unable to execute dex: Java heap size' - try to upgrade eclipse.ini to https://groups.google.com/forum/?fromgroups=#!topic/phonegap/yWePvssyiLE
 
 ### 4. Declare internet permission for Android application
