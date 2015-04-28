@@ -34,10 +34,12 @@ Android SDK is really simple to use. Just in few minutes you can power your mobi
 * [How to get app credentials](http://quickblox.com/developers/Getting_application_credentials)
 
 ### 2. Create new Android project
-### 3. Add module dependency in gradle build script
+### 3. Add module dependency in gradle build script like
 ```bash
 compile 'com.quickblox:qb-module:qb-version'
-like
+```
+especially
+```
 compile 'com.quickblox:quickblox-android-sdk-core:2.2.1'
 ```
 Eclipse users: If you got 'Unable to execute dex: Java heap size' - try to upgrade eclipse.ini to https://groups.google.com/forum/?fromgroups=#!topic/phonegap/yWePvssyiLE
