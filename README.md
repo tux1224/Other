@@ -2,14 +2,14 @@
 
 This project contains QuickBlox Android SDK, that includes
 
-* [framework library jar](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/jar)
+* framework library dependency
 * [snippets](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/snippets) (shows main use cases of using this one)
 * samples (separated samples for each QuickBlox module)
   * [Chat Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-chat)
 
 ## How to start
 
-To start work you should add framework repository via maven in your app build script 
+To start work you should add QuickBlox framework repository via maven in your app build script 
 ```bash
 repositories {
         maven {
