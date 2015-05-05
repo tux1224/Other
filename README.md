@@ -2,27 +2,27 @@
 
 This project contains QuickBlox Android SDK, that includes
 
-* [framework library jars](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/jars)
+* framework library dependency
 * [snippets](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/snippets) (shows main use cases of using this one)
 * samples (separated samples for each QuickBlox module)
   * [Chat Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-chat)
-  * [Users Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-users)
-  * [Push Notifications Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-messages)
-  * [Location Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-location)
-  * [Custom Objects Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-custom-objects)
-  * [Content Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-content)
-  * [Video Chat Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-videochat)
-  * [Video Chat WebRTC Sample](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/sample-videochat-webrtc)
 
 ## How to start
 
-To start work you should just put library jars into your project and call desired methods.
+To start work you should add QuickBlox framework repository via maven in your app build script 
+```bash
+repositories {
+        maven {
+            url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+        }
+    }
+```
 
-Latest jar-packed framework file you can clone from [jars  folder](https://github.com/QuickBlox/quickblox-android-sdk/tree/master/jars).
 
 ## Documentation
 
 * [Project page on QuickBlox developers section](http://quickblox.com/developers/Android)
+* **[Start to learn SDK from Android Guide](http://quickblox.com/developers/Android_Guide)**
 * [Framework reference in JavaDoc format](http://sdk.quickblox.com/android/)
 
 ## Oh, please, please show me the code
@@ -34,11 +34,15 @@ Android SDK is really simple to use. Just in few minutes you can power your mobi
 * [How to get app credentials](http://quickblox.com/developers/Getting_application_credentials)
 
 ### 2. Create new Android project
-### 3. Add jars to project libs folder.
-Update your build.gradle file if need.
-
+### 3. Add module dependency in gradle build script like
+```bash
+compile 'com.quickblox:qb-module:qb-version'
+```
+especially
+```
+compile 'com.quickblox:quickblox-android-sdk-core:2.2.1'
+```
 Eclipse users: If you got 'Unable to execute dex: Java heap size' - try to upgrade eclipse.ini to https://groups.google.com/forum/?fromgroups=#!topic/phonegap/yWePvssyiLE
-
 
 ### 4. Declare internet permission for Android application
 
@@ -64,19 +68,25 @@ The common way to interact with QuickBlox can be presented with following sequen
 QBSettings.getInstance().fastConfigInit("961", "PBZxXW3WgGZtFZv", "vvHjRbVFF6mmeyJ");
 ```
 
+or step by step
+
+
+```java
+QBSettings.getInstance().setApplicationId("961");
+QBSettings.getInstance().setAuthorizationKey("PBZxXW3WgGZtFZv");
+QBSettings.getInstance().setAuthorizationSecret("vvHjRbVFF6mmeyJ");
+```
+
 #### 5.2. Create session
 
 
 ```java
-QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
+QBAuth.createSession(new QBCallbackImpl() {
     @Override
-    public void onSuccess(QBSession session, Bundle params) {
-        // success
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-        // errors
+    public void onComplete(Result result) {
+        if (result.isSuccess()) {
+            // result comes here if authorization is success
+        }
     }
 });
 ```
@@ -87,17 +97,12 @@ First create (register) new user
 
 ```java
 // Register new user
-final QBUser user = new QBUser("userlogin", "userpassword");
-
-QBUsers.signUp(user, new QBEntityCallbackImpl<QBUser>() {
+QBUsers.signUp("indianajones", "indianapassword", new QBCallbackImpl() {
     @Override
-    public void onSuccess(QBUser user, Bundle args) {
-        // success
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-       // error
+    public void onComplete(Result result) {
+        if (result.isSuccess()) {
+            // result comes here if request has been completed successfully
+        }
     }
 });
 ```
@@ -106,15 +111,12 @@ then authorize user
 
 ```java
 // Login
-QBUsers.signIn(user, new QBEntityCallbackImpl<QBUser>() {
+QBUsers.signIn("indianajones", "indianapassword", new QBCallbackImpl() {
     @Override
-    public void onSuccess(QBUser user, Bundle args) {
-        // success
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-        // error
+    public void onComplete(Result result) {
+        if (result.isSuccess()) {
+            // result comes here if request has been completed successfully
+        }
     }
 });
 ```
@@ -128,15 +130,12 @@ double lat = 25.224820; // Somewhere in Africa
 double lng = 9.272461;
 String statusText = "trying to find adventures";
 QBLocation location = new QBLocation(lat, lng, statusText);
-QBLocations.createLocation(location, new QBEntityCallbackImpl<QBLocation>() {
+QBLocations.createLocation(location, new QBCallbackImpl() {
     @Override
-    public void onSuccess(QBLocation qbLocation, Bundle args) {
-        // success
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-        // error
+    public void onComplete(Result result) {
+        if (result.isSuccess()) {
+            // result comes here if authorizations is success
+        }
     }
 });
 ```
@@ -146,30 +145,30 @@ or put Holy Grail into storage
 ```java
 File file = new File("holy_grail.txt");
 Boolean fileIsPublic = true;
-QBContent.uploadFileTask(file1, fileIsPublic, null, new QBEntityCallbackImpl<QBFile>() {
+QBContent.uploadFileTask(file, fileIsPublic, new QBCallbackImpl() {
     @Override
-    public void onSuccess(QBFile qbFile, Bundle params) {
-        // success
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-        // error
+    public void onComplete(Result result) {
+        if (result.isSuccess()) {
+            // file has been successfully uploaded
+        }
     }
 });
 ```
 
-Java Framework provides following jars/services to interact with QuickBlox functions (each service is represented by a model with suite of static methods):
+Java Framework provides following services to interact with QuickBlox functions (each service is represented by model with suite of static methods):
 
-* quickblox-android-sdk-core.jar (contains core, auth and users classes)
-* quickblox-android-sdk-chat.jar (contains chat class)
-* quickblox-android-sdk-customobjects.jar (contains custom objects class)
-* quickblox-android-sdk-location.jar (contains location class)
-* quickblox-android-sdk-content.jar (contains content class) 
-* quickblox-android-sdk-messages.jar (contains messages class) 
-* quickblox-android-sdk-ratings.jar (contains ratings class) 
-* quickblox-android-sdk-videochat.jar (contains video chat classes)  
-* quickblox-android-sdk-videochat-webrtc.jar (contains video chat webrtc classes)
+* QBAuth
+* QBUsers
+* QBCustomObjects
+* QBLocations
+* QBContent
+* QBRatings
+* QBMessages
+* QBChat
+
+## How to run snippets project
+
+* See <https://github.com/QuickBlox/quickblox-android-sdk/tree/master/snippets#snippets>
 
 ## See also
 
