@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-android {
 
+android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
 
@@ -12,9 +12,10 @@ android {
             res.srcDirs = ['res']
         }
     }
+
 }
 
 dependencies {
-    compile 'com.quickblox:quickblox-android-sdk-core:2.2.1'
-    compile 'com.android.support:appcompat-v7:18.0.+'
+    compile "com.quickblox:quickblox-android-sdk-core:$rootProject.qbSdkVersion"
+    compile "com.android.support:appcompat-v7:$rootProject.androidSupportVersion"
 }

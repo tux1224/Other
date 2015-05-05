@@ -14,10 +14,9 @@ android {
 }
 
 dependencies {
-
-    compile 'com.quickblox:quickblox-android-sdk-core:2.2.1@jar'
-    compile 'com.quickblox:quickblox-android-sdk-messages:2.2.1@jar'
-    compile 'com.android.support:support-v4:22.1.0'
-    compile 'com.android.support:appcompat-v7:22.1.0'
-    compile 'com.google.android.gms:play-services:7.0.0'
+    compile "com.quickblox:quickblox-android-sdk-core:$rootProject.qbSdkVersion"
+    compile "com.quickblox:quickblox-android-sdk-messages:$rootProject.qbSdkVersion"
+    compile "com.google.android.gms:play-services:$rootProject.playServiceVersion"
+    compile "com.android.support:support-v4:$rootProject.androidSupportVersion"
+    compile "com.android.support:appcompat-v7:$rootProject.androidSupportVersion"
 }

@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-    compile 'com.quickblox:quickblox-android-sdk-core:2.2.1@jar'
-    compile 'com.quickblox:quickblox-android-sdk-customobjects:2.2.1@jar'
-    compile 'com.android.support:appcompat-v7:19.0.0'
+    compile "com.quickblox:quickblox-android-sdk-core:$rootProject.qbSdkVersion"
+    compile "com.quickblox:quickblox-android-sdk-customobjects:$rootProject.qbSdkVersion"
+    compile "com.android.support:appcompat-v7:$rootProject.androidSupportVersion"
 }

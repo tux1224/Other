@@ -6,9 +6,9 @@ android {
 }
 
 dependencies {
-    compile 'com.quickblox:quickblox-android-sdk-core:2.2.1'
-    compile 'com.quickblox:quickblox-android-sdk-chat:2.2.1'
-    compile 'com.quickblox:quickblox-android-sdk-videochat:2.2.1'
+    compile "com.quickblox:quickblox-android-sdk-core:$rootProject.qbSdkVersion"
+    compile "com.quickblox:quickblox-android-sdk-chat:$rootProject.qbSdkVersion"
+    compile "com.quickblox:quickblox-android-sdk-videochat:$rootProject.qbSdkVersion"
 }
 
 
