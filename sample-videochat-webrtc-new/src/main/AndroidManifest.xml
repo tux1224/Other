@@ -28,6 +28,9 @@
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:screenOrientation="portrait">
         </activity>
+        <service
+            android:name=".services.IncomeCallListenerService">
+        </service>
 
 
 

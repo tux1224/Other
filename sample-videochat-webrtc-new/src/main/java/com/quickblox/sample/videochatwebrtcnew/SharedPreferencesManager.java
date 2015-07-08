@@ -1,0 +1,65 @@
+package com.quickblox.sample.videochatwebrtcnew;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+
+/**
+ * Created by tereha on 08.07.15.
+ */
+public class SharedPreferencesManager extends Activity {
+
+    private final SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private static SharedPreferencesManager instance;
+
+    public static SharedPreferencesManager getPrefsManager() {
+        return instance;
+    }
+
+    public SharedPreferencesManager (Context context) {
+        instance = this;
+        String prefsFile = context.getPackageName();
+        sharedPreferences = context.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+    }
+
+    public void savePref(String key, Object value) {
+        delete(key);
+
+        if (value instanceof Boolean) {
+            editor.putBoolean(key, (Boolean) value);
+        } else if (value instanceof Integer) {
+            editor.putInt(key, (Integer) value);
+        } else if (value instanceof Float) {
+            editor.putFloat(key, (Float) value);
+        } else if (value instanceof Long) {
+            editor.putLong(key, (Long) value);
+        } else if (value instanceof String) {
+            editor.putString(key, (String) value);
+        } else if (value instanceof Enum) {
+            editor.putString(key, value.toString());
+        } else if (value != null) {
+            throw new RuntimeException("Attempting to save non-primitive preference");
+        }
+
+        editor.commit();
+    }
+
+    public <T> T getPref(String key, T defValue) {
+        T returnValue = (T) sharedPreferences.getAll().get(key);
+        return returnValue == null ? defValue : returnValue;
+    }
+
+    public void delete(String key) {
+        if (sharedPreferences.contains(key)) {
+            editor.remove(key).commit();
+        }
+    }
+
+    public void clearAllPrefs(){
+        if(sharedPreferences != null) {
+            editor.clear().commit();
+        }
+    }
+}

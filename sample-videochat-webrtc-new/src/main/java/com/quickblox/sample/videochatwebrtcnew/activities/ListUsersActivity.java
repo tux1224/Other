@@ -18,10 +18,12 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
 import com.quickblox.sample.videochatwebrtcnew.R;
+import com.quickblox.sample.videochatwebrtcnew.SharedPreferencesManager;
 import com.quickblox.sample.videochatwebrtcnew.User;
 import com.quickblox.sample.videochatwebrtcnew.adapters.UsersAdapter;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
+import com.quickblox.sample.videochatwebrtcnew.services.IncomeCallListenerService;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -194,8 +196,9 @@ public class ListUsersActivity extends Activity {
 
                 loginPB.setVisibility(View.INVISIBLE);
 
-                if (chatService.isLoggedIn()){
+                if (chatService.isLoggedIn()) {
                     startCallActivity(login);
+                    saveUserDataToPreferences(login, password);
                 } else {
                     chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
 
@@ -203,12 +206,14 @@ public class ListUsersActivity extends Activity {
                         public void onSuccess(QBUser result, Bundle params) {
                             Log.d(TAG, "onSuccess login to chat with params");
                             startCallActivity(login);
+                            saveUserDataToPreferences(login, password);
                         }
 
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "onSuccess login to chat");
                             startCallActivity(login);
+                            saveUserDataToPreferences(login, password);
                         }
 
                         @Override
@@ -242,6 +247,21 @@ public class ListUsersActivity extends Activity {
         Intent intent = new Intent(ListUsersActivity.this, CallActivity.class);
         intent.putExtra("login", login);
         startActivityForResult(intent, Consts.CALL_ACTIVITY_CLOSE);
+    }
+
+    private void saveUserDataToPreferences(String login, String password){
+        SharedPreferencesManager sManager = SharedPreferencesManager.getPrefsManager();
+        sManager.savePref(Consts.USER_LOGIN, login);
+        sManager.savePref(Consts.USER_PASSWORD, password);
+    }
+
+    private void startIncomeCallListenerService(){
+        startService(new Intent(this, IncomeCallListenerService.class));
+    }
+
+    private void stopIncomeCallListenerService(){
+        stopService(new Intent(this, IncomeCallListenerService.class));
+
     }
 
     @Override
