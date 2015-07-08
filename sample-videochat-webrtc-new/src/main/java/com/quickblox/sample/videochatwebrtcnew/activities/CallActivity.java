@@ -498,6 +498,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         super.onDestroy();
         opponentsList = null;
         OpponentsAdapter.i = 0;
+
         // Remove activity as callback to RTCClient
 //        if (QBRTCClient.isInitiated()) {
 //            try {
