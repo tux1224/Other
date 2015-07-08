@@ -13,15 +13,12 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.core.QBCallbackImpl;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.core.result.Result;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.simplesample.messages.App;
-import com.quickblox.simplesample.messages.main.definitions.Consts;
+import com.quickblox.simplesample.messages.main.Consts;
 
 import java.io.IOException;
 import java.util.ArrayList;
