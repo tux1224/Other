@@ -24,6 +24,8 @@ import android.widget.ToggleButton;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
+import com.quickblox.sample.videochatwebrtcnew.SessionManager;
+import com.quickblox.sample.videochatwebrtcnew.activities.BaseLogginedUserActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
@@ -85,12 +87,13 @@ public class ConversationFragment extends Fragment implements Serializable {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         view = inflater.inflate(R.layout.fragment_conversation, container, false);
         this.inflater = inflater;
         this.container = container;
         Log.d(TAG, "Fragment. Thread id: " + Thread.currentThread().getId());
 
-        ((CallActivity) getActivity()).initActionBarWithTimer();
+//        ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
             opponents = getArguments().getIntegerArrayList(ApplicationSingleton.OPPONENTS);
@@ -146,20 +149,23 @@ public class ConversationFragment extends Fragment implements Serializable {
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart()");
 
         getActivity().registerReceiver(audioStreamReceiver, intentFilter);
 
         super.onStart();
-        QBRTCSession session = ((CallActivity) getActivity()).getCurrentSession();
-        if (!isMessageProcessed) {
+        QBRTCSession session = SessionManager.getCurrentSession();
+//        if (!isMessageProcessed) {
             if (startReason == StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
+                Log.d(TAG, "acceptCall() from " + TAG);
                 session.acceptCall(session.getUserInfo());
             } else {
+                Log.d(TAG, "startCall() from " + TAG);
                 session.startCall(session.getUserInfo());
                 startOutBeep();
             }
-            isMessageProcessed = true;
-        }
+//            isMessageProcessed = true;
+//        }
     }
 
     private void startOutBeep() {
@@ -215,16 +221,18 @@ public class ConversationFragment extends Fragment implements Serializable {
         handUpVideoCall = (ImageButton) view.findViewById(R.id.handUpVideoCall);
         incUserName = (TextView) view.findViewById(R.id.incUserName);
         incUserName.setText(callerName);
-        incUserName.setBackgroundResource(ListUsersActivity.selectBackgrounForOpponent((
+        incUserName.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
                 DataHolder.getUserIndexByFullName(callerName)) + 1));
 
         noVideoImageContainer = (LinearLayout) view.findViewById(R.id.noVideoImageContainer);
         imgMyCameraOff = (ImageView) view.findViewById(R.id.imgMyCameraOff);
 
         actionButtonsEnabled(false);
+        Log.d(TAG, "initViews() from " + TAG);
     }
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         // If user changed camera state few times and last state was CameraState.ENABLED_FROM_USER // Жень, глянь здесь, смысл в том, что мы здесь включаем камеру, если юзер ее не выключал
@@ -237,6 +245,7 @@ public class ConversationFragment extends Fragment implements Serializable {
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause()");
         // If camera state is CameraState.ENABLED_FROM_USER or CameraState.NONE
         // than we turn off cam
         if(cameraState != CameraState.DISABLED_FROM_USER) {
@@ -248,6 +257,7 @@ public class ConversationFragment extends Fragment implements Serializable {
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop()");
         super.onStop();
         stopOutBeep();
         getActivity().unregisterReceiver(audioStreamReceiver);
@@ -258,8 +268,8 @@ public class ConversationFragment extends Fragment implements Serializable {
         switchCameraToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((CallActivity) getActivity()).getCurrentSession() != null) {
-                    ((CallActivity) getActivity()).getCurrentSession().switchCapturePosition(new Runnable() {
+                if (SessionManager.getCurrentSession() != null) {
+                    SessionManager.getCurrentSession().switchCapturePosition(new Runnable() {
                         @Override
                         public void run() {
 //                            Toast.makeText(getActivity(), "Cam was switched", Toast.LENGTH_LONG).show();
@@ -290,9 +300,9 @@ public class ConversationFragment extends Fragment implements Serializable {
         dynamicToggleVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((CallActivity) getActivity()).getCurrentSession() != null) {
+                if (SessionManager.getCurrentSession() != null) {
                     Log.d(TAG, "Dynamic switched!");
-                    ((CallActivity) getActivity()).getCurrentSession().switchAudioOutput();
+                    SessionManager.getCurrentSession().switchAudioOutput();
                 }
             }
         });
@@ -300,14 +310,14 @@ public class ConversationFragment extends Fragment implements Serializable {
         micToggleVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((CallActivity) getActivity()).getCurrentSession() != null) {
+                if (SessionManager.getCurrentSession() != null) {
                     if (isAudioEnabled) {
                         Log.d(TAG, "Mic is off!");
-                        ((CallActivity) getActivity()).getCurrentSession().setAudioEnabled(false);
+                        SessionManager.getCurrentSession().setAudioEnabled(false);
                         isAudioEnabled = false;
                     } else {
                         Log.d(TAG, "Mic is on!");
-                        ((CallActivity) getActivity()).getCurrentSession().setAudioEnabled(true);
+                        SessionManager.getCurrentSession().setAudioEnabled(true);
                         isAudioEnabled = true;
                     }
                 }
@@ -346,8 +356,8 @@ public class ConversationFragment extends Fragment implements Serializable {
         Log.d(TAG, "Width is: " + imgMyCameraOff.getLayoutParams().width + " height is:" + imgMyCameraOff.getLayoutParams().height);
         // TODO end
 
-        if (((CallActivity) getActivity()).getCurrentSession() != null) {
-            ((CallActivity) getActivity()).getCurrentSession().setVideoEnabled(isNeedEnableCam);
+        if (SessionManager.getCurrentSession() != null) {
+            SessionManager.getCurrentSession().setVideoEnabled(isNeedEnableCam);
             cameraToggle.setChecked(isNeedEnableCam);
 
             if (isNeedEnableCam) {
@@ -405,7 +415,7 @@ public class ConversationFragment extends Fragment implements Serializable {
 
             TextView opponentNumber = (TextView) opponentItemView.findViewById(R.id.opponentNumber);
             opponentNumber.setText(String.valueOf(ListUsersActivity.getUserIndex(userID)));
-            opponentNumber.setBackgroundResource(ListUsersActivity.resourceSelector
+            opponentNumber.setBackgroundResource(BaseLogginedUserActivity.resourceSelector
                     (ListUsersActivity.getUserIndex(userID)));
 
             ImageView opponentAvatar = (ImageView) opponentItemView.findViewById(R.id.opponentAvatar);

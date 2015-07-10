@@ -1,25 +1,26 @@
-package com.quickblox.sample.videochatwebrtcnew.fragments;
+package com.quickblox.sample.videochatwebrtcnew.activities;
 
-import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBSignaling;
+import com.quickblox.chat.QBWebRTCSignaling;
+import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.sample.videochatwebrtcnew.R;
-import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.adapters.OpponentsAdapter;
+import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
+import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -27,7 +28,6 @@ import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import org.jivesoftware.smack.SmackException;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,55 +36,64 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by tereha on 16.02.15.
- */
-public class OpponentsFragment extends Fragment implements View.OnClickListener, Serializable {
+
+public class OpponentsActivity extends BaseLogginedUserActivity implements View.OnClickListener {
 
 
-    private static final String TAG = OpponentsFragment.class.getSimpleName();
+    private static final String TAG = OpponentsActivity.class.getSimpleName();
     private OpponentsAdapter opponentsAdapter;
-    public static String login;
     private Button btnAudioCall;
     private Button btnVideoCall;
-    private View view=null;
-    private ProgressDialog progresDialog;
-    private ListView opponentsList;
+    private ProgressDialog progressDialog;
+    private ListView opponentsListView;
+    private ArrayList<QBUser> opponentsList;
 
 
-    public static OpponentsFragment getInstance() {
-        return new OpponentsFragment();
+    public static OpponentsActivity getInstance() {
+        return new OpponentsActivity();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_opponents);
 
-        ((CallActivity)getActivity()).initActionBar();
+        loginedUser = QBChatService.getInstance().getUser();
 
-        view = inflater.inflate(R.layout.fragment_opponents, container, false);
+        initActionBar();
+        initUI();
+        initProgressDialog();
+        initOpponentListAdapter();
+//        startIncomeCallListenerService();
+//        CallActivity.initQBRTCClient();
+//
+//        QBChatService.getInstance().getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
+//            @Override
+//            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+//                if (!createdLocally) {
+//                    QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
+//                    Log.d(TAG, "signaling created");
+//                }
+//            }
+//        });
+//        QBRTCClient.getInstance().prepareToProcessCalls(this);
+    }
 
-        initUI(view);
-
-        // Show dialog till opponents loading
-        progresDialog = new ProgressDialog(getActivity()) {
+    private void initProgressDialog() {
+        progressDialog = new ProgressDialog(this) {
             @Override
             public void onBackPressed() {
-                Toast.makeText(getActivity(), "Wait until loading finish", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OpponentsActivity.this, getString(R.string.wait_until_loading_finish), Toast.LENGTH_SHORT).show();
             }
         };
-        progresDialog.setMessage("Load opponents ...");
-        progresDialog.setCanceledOnTouchOutside(false);
-        progresDialog.show();
-
-        initOpponentListAdapter();
-
-//         Log.d(TAG, "onCreateView() from OpponentsFragment Level 2");
-        return view;
+        progressDialog.setMessage(getString(R.string.load_opponents));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
     }
 
     private void initOpponentListAdapter() {
-        final ListView opponentsList = (ListView) view.findViewById(R.id.opponentsList);
-        List<QBUser> users = ((CallActivity) getActivity()).getOpponentsList();
+        final ListView opponentsList = (ListView) findViewById(R.id.opponentsList);
+        List<QBUser> users = getOpponentsList();
 
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPerPage(100);
@@ -92,19 +101,13 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
         if (users == null) {
             List<String> tags = new LinkedList<>();
             tags.add("webrtcusers");
-//            tags.add("webrtctest");
             QBUsers.getUsersByTags(tags, requestBuilder, new QBEntityCallback<ArrayList<QBUser>>() {
                 @Override
                 public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
-//                    Log.d(TAG, "download users from QickBlox");
                     ArrayList<QBUser> orderedUsers = reorderUsersByName(qbUsers);
-                    if(isAdded()) {
-                        ((CallActivity) getActivity()).setOpponentsList(orderedUsers);
-                        prepareUserList(opponentsList, orderedUsers);
-                        progresDialog.dismiss();
-                    } else {
-                        Log.e("getActivity() error", "get Activity is null, because adapter wasn't added");
-                    }
+                    setOpponentsList(orderedUsers);
+                    prepareUserList(opponentsList, orderedUsers);
+                    hideProgressDialog();
                 }
 
                 @Override
@@ -117,44 +120,44 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
                 }
             });
         } else {
-
-            ArrayList<QBUser> userList = ((CallActivity) getActivity()).getOpponentsList();
+            ArrayList<QBUser> userList = getOpponentsList();
             prepareUserList(opponentsList, userList);
-            progresDialog.dismiss();
+            hideProgressDialog();
+        }
+    }
+    public void setOpponentsList(ArrayList<QBUser> qbUsers) {
+        this.opponentsList = qbUsers;
+    }
 
+    public ArrayList<QBUser> getOpponentsList() {
+        return opponentsList;
+    }
+
+    private void hideProgressDialog() {
+        if (progressDialog != null){
+            progressDialog.dismiss();
         }
     }
 
     private void prepareUserList(ListView opponentsList, List<QBUser> users) {
-        int i = searchIndexLogginedUser(users);
+        int i = DataHolder.getUserIndexByID(QBChatService.getInstance().getUser().getId());
         if (i >= 0)
             users.remove(i);
 
         // Prepare users list for simple adapter.
-        //
-        opponentsAdapter = new OpponentsAdapter(getActivity(), users);
+        opponentsAdapter = new OpponentsAdapter(this, users);
         opponentsList.setAdapter(opponentsAdapter);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-//        setRetainInstance(true);
-        setHasOptionsMenu(true);
-        Log.d(TAG, "onCreate() from OpponentsFragment");
-        super.onCreate(savedInstanceState);
-    }
+    private void initUI() {
 
-    private void initUI(View view) {
-
-        login = getActivity().getIntent().getStringExtra("login");
-
-        btnAudioCall = (Button)view.findViewById(R.id.btnAudioCall);
-        btnVideoCall = (Button)view.findViewById(R.id.btnVideoCall);
+        btnAudioCall = (Button) findViewById(R.id.btnAudioCall);
+        btnVideoCall = (Button) findViewById(R.id.btnVideoCall);
 
         btnAudioCall.setOnClickListener(this);
         btnVideoCall.setOnClickListener(this);
 
-        opponentsList = (ListView) view.findViewById(R.id.opponentsList);
+        opponentsListView = (ListView) findViewById(R.id.opponentsList);
     }
 
     @Override
@@ -179,19 +182,21 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
             userInfo.put("any_custom_data", "some data");
             userInfo.put("my_avatar_url", "avatar_reference");
 
-            ((CallActivity) getActivity())
-                    .addConversationFragmentStartCall(getOpponentsIds(opponentsAdapter.getSelected()),
-                            qbConferenceType, userInfo);
+            CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
+                    userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
 
-//        } else if (opponentsAdapter.getSelected().size() > 1){
-//            Toast.makeText(getActivity(), "Only 1-to-1 calls are available", Toast.LENGTH_LONG).show();
+//            CallActivity.getInstance().addConversationFragmentStartCall(getOpponentsIds(opponentsAdapter.getSelected()),
+//                    qbConferenceType, userInfo);
+
+        } else if (opponentsAdapter.getSelected().size() > 1){
+            Toast.makeText(this, getString(R.string.only_peer_to_peer_calls), Toast.LENGTH_LONG).show();
         } else if (opponentsAdapter.getSelected().size() < 1){
-            Toast.makeText(getActivity(), "Choose one opponent", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.choose_one_opponent), Toast.LENGTH_LONG).show();
         }
     }
 
     public static ArrayList<Integer> getOpponentsIds(List<QBUser> opponents){
-        ArrayList<Integer> ids = new ArrayList<Integer>();
+        ArrayList<Integer> ids = new ArrayList<>();
         for(QBUser user : opponents){
             ids.add(user.getId());
         }
@@ -203,7 +208,7 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
         super.onStart();
 
         if (OpponentsAdapter.i > 0){
-            opponentsList.setSelection(OpponentsAdapter.i);
+            opponentsListView.setSelection(OpponentsAdapter.i);
 
         }
     }
@@ -211,16 +216,14 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
         super.onPause();
-        if(progresDialog.isShowing()) {
-            progresDialog.dismiss();
+        if(progressDialog.isShowing()) {
+            hideProgressDialog();
         }
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -233,7 +236,7 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 }
-                getActivity().finish();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -260,15 +263,18 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
         });
         return resultList;
     }
-
-    public static int searchIndexLogginedUser(List<QBUser> usersList) {
-        int indexLogginedUser = -1;
-        for (QBUser usr : usersList) {
-            if (usr.getLogin().equals(login)) {
-                indexLogginedUser = usersList.indexOf(usr);
-                break;
+    @Override
+    public void onBackPressed() {
+        // Logout on back btn click
+        if (QBChatService.isInitialized()) {
+            try {
+                QBRTCClient.getInstance().close(true);
+                QBChatService.getInstance().logout();
+            } catch (SmackException.NotConnectedException e) {
+                e.printStackTrace();
             }
         }
-        return indexLogginedUser;
+        super.onBackPressed();
     }
+
 }

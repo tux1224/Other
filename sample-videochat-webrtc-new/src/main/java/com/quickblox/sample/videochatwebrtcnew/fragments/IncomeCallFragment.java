@@ -17,6 +17,8 @@ import android.widget.TextView;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
+import com.quickblox.sample.videochatwebrtcnew.SessionManager;
+import com.quickblox.sample.videochatwebrtcnew.activities.BaseLogginedUserActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
@@ -69,17 +71,17 @@ public class IncomeCallFragment extends Fragment implements Serializable {
             Log.d(TAG, conferenceType.toString() + "From onCreateView()");
         }
 
-        if (savedInstanceState == null) {
+//        if (savedInstanceState == null) {
 
             view = inflater.inflate(R.layout.fragment_income_call, container, false);
 
-            ((CallActivity) getActivity()).initActionBar();
+//            ((CallActivity) getActivity()).initActionBar();
 
             initUI(view);
             setDisplayedTypeCall(conferenceType);
             initButtonsListener();
 
-        }
+//        }
 
         return view;
     }
@@ -108,9 +110,7 @@ public class IncomeCallFragment extends Fragment implements Serializable {
                     stopCallNotification();
 
                     ((CallActivity) getActivity()).rejectCurrentSession();
-                    ((CallActivity) getActivity()).removeIncomeCallFragment();
-                    ((CallActivity) getActivity()).addOpponentsFragment();
-
+                    getActivity().finish();
                 }
             });
 
@@ -134,9 +134,9 @@ public class IncomeCallFragment extends Fragment implements Serializable {
         incVideoCall = (TextView) view.findViewById(R.id.incVideoCall);
 
         callerName = (TextView) view.findViewById(R.id.callerName);
-        callerName.setText(getCallerName(((CallActivity) getActivity()).getCurrentSession()));
-        callerName.setBackgroundResource(ListUsersActivity.selectBackgrounForOpponent((DataHolder.getUserIndexByID((
-                ((CallActivity) getActivity()).getCurrentSession().getCallerID()))) + 1));
+        callerName.setText(getCallerName(SessionManager.getCurrentSession()));
+        callerName.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((DataHolder.getUserIndexByID((
+                SessionManager.getCurrentSession().getCallerID()))) + 1));
 
         otherIncUsers = (TextView) view.findViewById(R.id.otherIncUsers);
         otherIncUsers.setText(getOtherIncUsersNames(opponents));

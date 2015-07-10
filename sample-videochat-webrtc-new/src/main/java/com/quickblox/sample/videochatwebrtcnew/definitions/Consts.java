@@ -16,4 +16,13 @@ public class Consts {
     //CALL ACTIVITY CLOSE REASONS
     public static final int CALL_ACTIVITY_CLOSE_WIFI_DISABLED = 1001;
     public static final String WIFI_DISABLED = "wifi_disabled";
+    public static final String OPPONENTS_LIST_EXTRAS = "opponents_list";
+    public static final String CALL_DIRECTION_TYPE_EXTRAS = "call_direction_type";
+    public static final String CALL_TYPE_EXTRAS = "call_type";
+    public static final String QBRTCSESSION_EXTRAS = "qbrtcsession";
+    public static final String USER_INFO_EXTRAS = "user_info";
+
+    public enum CALL_DIRECTION_TYPE {
+        INCOMING, OUTGOING
+    }
 }

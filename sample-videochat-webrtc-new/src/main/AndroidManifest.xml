@@ -24,6 +24,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.OpponentsActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".activities.CallActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:screenOrientation="portrait">

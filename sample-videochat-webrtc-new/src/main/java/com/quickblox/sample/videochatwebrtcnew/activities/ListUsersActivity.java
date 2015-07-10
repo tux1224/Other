@@ -60,10 +60,10 @@ public class ListUsersActivity extends Activity {
             getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
         }
 
-        if (!QBChatService.isInitialized()) {
-            QBChatService.init(this);
-            chatService = QBChatService.getInstance();
-        }
+//        if (!QBChatService.isInitialized()) {
+//            QBChatService.init(this);
+//            chatService = QBChatService.getInstance();
+//        }
         initUsersList();
 
     }
@@ -73,84 +73,6 @@ public class ListUsersActivity extends Activity {
         loginPB = (ProgressBar) findViewById(R.id.loginPB);
         loginPB.setVisibility(View.INVISIBLE);
 
-    }
-
-    public static int resourceSelector(int number) {
-        int resStr = -1;
-        switch (number) {
-            case 0:
-                resStr = R.drawable.shape_oval_spring_bud;
-                break;
-            case 1:
-                resStr = R.drawable.shape_oval_orange;
-                break;
-            case 2:
-                resStr = R.drawable.shape_oval_water_bondi_beach;
-                break;
-            case 3:
-                resStr = R.drawable.shape_oval_blue_green;
-                break;
-            case 4:
-                resStr = R.drawable.shape_oval_lime;
-                break;
-            case 5:
-                resStr = R.drawable.shape_oval_mauveine;
-                break;
-            case 6:
-                resStr = R.drawable.shape_oval_gentianaceae_blue;
-                break;
-            case 7:
-                resStr = R.drawable.shape_oval_blue;
-                break;
-            case 8:
-                resStr = R.drawable.shape_oval_blue_krayola;
-                break;
-            case 9:
-                resStr = R.drawable.shape_oval_coral;
-                break;
-            default:
-                resStr = resourceSelector(number % 10);
-        }
-        return resStr;
-    }
-
-    public static int selectBackgrounForOpponent(int number) {
-        int resStr = -1;
-        switch (number) {
-            case 0:
-                resStr = R.drawable.rectangle_rounded_spring_bud;
-                break;
-            case 1:
-                resStr = R.drawable.rectangle_rounded_orange;
-                break;
-            case 2:
-                resStr = R.drawable.rectangle_rounded_water_bondi_beach;
-                break;
-            case 3:
-                resStr = R.drawable.rectangle_rounded_blue_green;
-                break;
-            case 4:
-                resStr = R.drawable.rectangle_rounded_lime;
-                break;
-            case 5:
-                resStr = R.drawable.rectangle_rounded_mauveine;
-                break;
-            case 6:
-                resStr = R.drawable.rectangle_rounded_gentianaceae_blue;
-                break;
-            case 7:
-                resStr = R.drawable.rectangle_rounded_blue;
-                break;
-            case 8:
-                resStr = R.drawable.rectangle_rounded_blue_krayola;
-                break;
-            case 9:
-                resStr = R.drawable.rectangle_rounded_coral;
-                break;
-            default:
-                resStr = selectBackgrounForOpponent(number % 10);
-        }
-        return resStr;
     }
 
     public static int getUserIndex(int id) {
@@ -166,8 +88,6 @@ public class ListUsersActivity extends Activity {
     }
 
     private void initUsersList() {
-
-
         usersListAdapter = new UsersAdapter(this, users);
         usersList.setAdapter(usersListAdapter);
         usersList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -178,13 +98,21 @@ public class ListUsersActivity extends Activity {
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
 
-                createSession(login, password);
+                startIncomeCallListenerService(login, password);
+
+//                createSession(login, password);
             }
         });
     }
 
-    private void createSession(final String login, final String password) {
+    private void startIncomeCallListenerService(String login, String password) {
+        Intent intent = new Intent(this, IncomeCallListenerService.class);
+        intent.putExtra(Consts.USER_LOGIN, login);
+        intent.putExtra(Consts.USER_PASSWORD, password);
+        startService(intent);
+    }
 
+    private void createSession(final String login, final String password) {
         loginPB.setVisibility(View.VISIBLE);
 
         final QBUser user = new QBUser(login, password);
@@ -197,7 +125,8 @@ public class ListUsersActivity extends Activity {
                 loginPB.setVisibility(View.INVISIBLE);
 
                 if (chatService.isLoggedIn()) {
-                    startCallActivity(login);
+//                    startCallActivity(login);
+                    startOpponentsActivity();
                     saveUserDataToPreferences(login, password);
                 } else {
                     chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
@@ -205,14 +134,16 @@ public class ListUsersActivity extends Activity {
                         @Override
                         public void onSuccess(QBUser result, Bundle params) {
                             Log.d(TAG, "onSuccess login to chat with params");
-                            startCallActivity(login);
+//                            startCallActivity(login);
+                            startOpponentsActivity();
                             saveUserDataToPreferences(login, password);
                         }
 
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "onSuccess login to chat");
-                            startCallActivity(login);
+//                            startCallActivity(login);
+                            startOpponentsActivity();
                             saveUserDataToPreferences(login, password);
                         }
 
@@ -243,6 +174,11 @@ public class ListUsersActivity extends Activity {
         });
     }
 
+    private void startOpponentsActivity(){
+        Intent intent = new Intent(ListUsersActivity.this, OpponentsActivity.class);
+        startActivityForResult(intent, Consts.CALL_ACTIVITY_CLOSE);
+    }
+
     private void startCallActivity(String login) {
         Intent intent = new Intent(ListUsersActivity.this, CallActivity.class);
         intent.putExtra("login", login);
@@ -253,15 +189,6 @@ public class ListUsersActivity extends Activity {
         SharedPreferencesManager sManager = SharedPreferencesManager.getPrefsManager();
         sManager.savePref(Consts.USER_LOGIN, login);
         sManager.savePref(Consts.USER_PASSWORD, password);
-    }
-
-    private void startIncomeCallListenerService(){
-        startService(new Intent(this, IncomeCallListenerService.class));
-    }
-
-    private void stopIncomeCallListenerService(){
-        stopService(new Intent(this, IncomeCallListenerService.class));
-
     }
 
     @Override
