@@ -72,7 +72,6 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
 
     private QBRTCSession currentSession;
-    public static String login;
     public static ArrayList<QBUser> qbOpponentsList;
 
     private Runnable showIncomingCallWindowTask;
@@ -133,9 +132,6 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
 
         Log.d(TAG, "Activity. Thread id: " + Thread.currentThread().getId());
-
-        // Probably initialize members with default values for a new instance
-
     }
 
     private void parseIntentExtras(Bundle extras) {
@@ -283,17 +279,11 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
     @Override
     protected void onResume() {
-        isInFront = true;
-
-//        if (currentSession == null){
-//            finish();
-//        }
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-//        isInFront = false;
         super.onPause();
     }
 
@@ -468,9 +458,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     }
 
                     Log.d(TAG, "Stop session");
-//                    addOpponentsFragmentWithDelay();
-//                    addOpponentsFragment();
-                    finish();
+                     finish();
 
                     // Remove current session
                     Log.d(TAG, "Remove current session");
@@ -617,7 +605,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     new ArrayList<>(opponents));
             bundle.putInt(ApplicationSingleton.CONFERENCE_TYPE, qbConferenceType.getValue());
             bundle.putInt(START_CONVERSATION_REASON, StartConversetionReason.OUTCOME_CALL_MADE.ordinal());
-            bundle.putString(CALLER_NAME, DataHolder.getUserNameByID(opponents.get(0)));
+            bundle.putString(CALLER_NAME, DataHolder.getUserNameByID(newSessionWithOpponents.getCallerID()));
 
             for (String key : userInfo.keySet()) {
                 bundle.putString("UserInfo:" + key, userInfo.get(key));
@@ -672,22 +660,22 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         OUTCOME_CALL_MADE;
     }
 
-    @Override
-    public void onBackPressed() {
-        // Logout on back btn click
-        Fragment fragment = getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
-        if (fragment == null) {
-            super.onBackPressed();
-            if (QBChatService.isInitialized()) {
-                try {
-                    QBRTCClient.getInstance().close(true);
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        // Logout on back btn click
+//        Fragment fragment = getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
+//        if (fragment == null) {
+//            super.onBackPressed();
+//            if (QBChatService.isInitialized()) {
+//                try {
+//                    QBRTCClient.getInstance().close(true);
+//                    QBChatService.getInstance().logout();
+//                } catch (SmackException.NotConnectedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     @Override
     protected void onDestroy() {

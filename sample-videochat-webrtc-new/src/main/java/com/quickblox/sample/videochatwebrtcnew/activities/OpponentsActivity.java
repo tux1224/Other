@@ -1,8 +1,10 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,11 +50,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     private ListView opponentsListView;
     private ArrayList<QBUser> opponentsList;
 
-
-    public static OpponentsActivity getInstance() {
-        return new OpponentsActivity();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,19 +61,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         initUI();
         initProgressDialog();
         initOpponentListAdapter();
-//        startIncomeCallListenerService();
-//        CallActivity.initQBRTCClient();
-//
-//        QBChatService.getInstance().getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
-//            @Override
-//            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-//                if (!createdLocally) {
-//                    QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
-//                    Log.d(TAG, "signaling created");
-//                }
-//            }
-//        });
-//        QBRTCClient.getInstance().prepareToProcessCalls(this);
     }
 
     private void initProgressDialog() {
@@ -265,16 +249,35 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     }
     @Override
     public void onBackPressed() {
-        // Logout on back btn click
-        if (QBChatService.isInitialized()) {
-            try {
-                QBRTCClient.getInstance().close(true);
-                QBChatService.getInstance().logout();
-            } catch (SmackException.NotConnectedException e) {
-                e.printStackTrace();
-            }
-        }
-        super.onBackPressed();
+        openQuitDialog();
     }
 
+    private void openQuitDialog() {
+        AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
+        quitDialog.setTitle(R.string.dialog_title);
+
+        quitDialog.setPositiveButton(R.string.positive_response, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                stopIncomeCallListenerService();
+                startListUsersActivity();
+                finish();
+            }
+        });
+
+        quitDialog.setNegativeButton(R.string.negative_response, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        quitDialog.show();
+    }
+
+    private void startListUsersActivity(){
+        Intent intent = new Intent(this, ListUsersActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+    }
 }

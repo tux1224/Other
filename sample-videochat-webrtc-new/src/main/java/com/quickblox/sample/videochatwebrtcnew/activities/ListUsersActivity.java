@@ -1,6 +1,7 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,15 +36,14 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by tereha on 25.01.15.
  */
-public class ListUsersActivity extends Activity {
+public class ListUsersActivity extends BaseLogginedUserActivity {
 
-    private static final String TAG = "ListUsersActivity";
+    private static final String TAG = ListUsersActivity.class.getSimpleName();
     private UsersAdapter usersListAdapter;
     private ListView usersList;
     private ProgressBar loginPB;
-    private Context context;
-    private static QBChatService chatService;
     private static ArrayList<User> users = DataHolder.createUsersList();
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -60,12 +60,7 @@ public class ListUsersActivity extends Activity {
             getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
         }
 
-//        if (!QBChatService.isInitialized()) {
-//            QBChatService.init(this);
-//            chatService = QBChatService.getInstance();
-//        }
         initUsersList();
-
     }
 
     private void initUI() {
@@ -97,7 +92,7 @@ public class ListUsersActivity extends Activity {
 
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
-
+                initProgressDialog();
                 startIncomeCallListenerService(login, password);
 
 //                createSession(login, password);
@@ -105,90 +100,22 @@ public class ListUsersActivity extends Activity {
         });
     }
 
-    private void startIncomeCallListenerService(String login, String password) {
-        Intent intent = new Intent(this, IncomeCallListenerService.class);
-        intent.putExtra(Consts.USER_LOGIN, login);
-        intent.putExtra(Consts.USER_PASSWORD, password);
-        startService(intent);
-    }
-
-    private void createSession(final String login, final String password) {
-        loginPB.setVisibility(View.VISIBLE);
-
-        final QBUser user = new QBUser(login, password);
-        QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
+    private void initProgressDialog() {
+        progressDialog = new ProgressDialog(this) {
             @Override
-            public void onSuccess(QBSession session, Bundle bundle) {
-                Log.d(TAG, "onSuccess create session with params");
-                user.setId(session.getUserId());
-
-                loginPB.setVisibility(View.INVISIBLE);
-
-                if (chatService.isLoggedIn()) {
-//                    startCallActivity(login);
-                    startOpponentsActivity();
-                    saveUserDataToPreferences(login, password);
-                } else {
-                    chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
-
-                        @Override
-                        public void onSuccess(QBUser result, Bundle params) {
-                            Log.d(TAG, "onSuccess login to chat with params");
-//                            startCallActivity(login);
-                            startOpponentsActivity();
-                            saveUserDataToPreferences(login, password);
-                        }
-
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess login to chat");
-//                            startCallActivity(login);
-                            startOpponentsActivity();
-                            saveUserDataToPreferences(login, password);
-                        }
-
-                        @Override
-                        public void onError(List errors) {
-                            loginPB.setVisibility(View.INVISIBLE);
-                            Toast.makeText(ListUsersActivity.this, "Error when login", Toast.LENGTH_SHORT).show();
-                            for (Object error : errors) {
-                                Log.d(TAG, error.toString());
-                            }
-                        }
-                    });
-                }
-
+            public void onBackPressed() {
+                Toast.makeText(ListUsersActivity.this, getString(R.string.wait_until_login_finish), Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onSuccess() {
-                super.onSuccess();
-                Log.d(TAG, "onSuccess create session");
-            }
-
-            @Override
-            public void onError(List<String> errors) {
-                loginPB.setVisibility(View.INVISIBLE);
-                Toast.makeText(ListUsersActivity.this, "Error when login, check test users login and password", Toast.LENGTH_SHORT).show();
-            }
-        });
+        };
+        progressDialog.setMessage(getString(R.string.processes_login));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
     }
 
-    private void startOpponentsActivity(){
-        Intent intent = new Intent(ListUsersActivity.this, OpponentsActivity.class);
-        startActivityForResult(intent, Consts.CALL_ACTIVITY_CLOSE);
-    }
-
-    private void startCallActivity(String login) {
-        Intent intent = new Intent(ListUsersActivity.this, CallActivity.class);
-        intent.putExtra("login", login);
-        startActivityForResult(intent, Consts.CALL_ACTIVITY_CLOSE);
-    }
-
-    private void saveUserDataToPreferences(String login, String password){
-        SharedPreferencesManager sManager = SharedPreferencesManager.getPrefsManager();
-        sManager.savePref(Consts.USER_LOGIN, login);
-        sManager.savePref(Consts.USER_PASSWORD, password);
+    private void hideProgressDialog() {
+        if (progressDialog != null){
+            progressDialog.dismiss();
+        }
     }
 
     @Override
@@ -204,5 +131,17 @@ public class ListUsersActivity extends Activity {
                 Toast.makeText(this, getString(R.string.WIFI_DISABLED),Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    protected void onStop() {
+        hideProgressDialog();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        hideProgressDialog();
+        super.onDestroy();
     }
 }

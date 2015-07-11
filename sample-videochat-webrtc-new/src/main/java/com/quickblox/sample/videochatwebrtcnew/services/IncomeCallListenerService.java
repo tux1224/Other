@@ -1,12 +1,13 @@
 package com.quickblox.sample.videochatwebrtcnew.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
@@ -24,13 +25,10 @@ import com.quickblox.sample.videochatwebrtcnew.activities.OpponentsActivity;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
-import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.List;
 import java.util.Map;
@@ -73,9 +71,24 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         }
 
 //        initQBRTCClient();
+        startForeground(1, createNotification());
 
         return super.onStartCommand(intent, flags, startId);
 
+    }
+
+    private Notification createNotification() {
+        Notification.Builder notificationBuilder = new Notification.Builder(IncomeCallListenerService.this);
+        notificationBuilder.setSmallIcon(R.drawable.logo_qb)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.logo_qb))
+                .setTicker(getResources().getString(R.string.service_launched))
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText(getResources().getString(R.string.service_launched));
+
+        Notification notification = notificationBuilder.build();
+
+        return notification;
     }
 
     private void initQBRTCClient() {
@@ -187,7 +200,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     @Override
     public void onDestroy() {
         QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
-
+        QBChatService.getInstance().destroy();
         super.onDestroy();
     }
 
@@ -200,6 +213,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
     }
+
+
+
+    //========== Implement methods ==========//
 
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {

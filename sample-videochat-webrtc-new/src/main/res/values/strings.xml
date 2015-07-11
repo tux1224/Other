@@ -20,6 +20,8 @@
     <string name="welcoming_message">Login as any user on this deviсe and another(s) users on another device</string>
     <string name="select_user_to_call">Select Users You Want to Call</string>
     <string name="choose_one_opponent">Choose one opponent</string>
+    <string name="service_launched">Service for listening to calls launched</string>
+
     
     //temporary values
     <string name="only_peer_to_peer_calls">Only 1-to-1 calls are available</string>
@@ -27,6 +29,9 @@
     //Progress Dialog
     <string name="load_opponents">Load opponents ...</string>
     <string name="wait_until_loading_finish">Wait until loading finish</string>
+
+    <string name="processes_login">Login ...</string>
+    <string name="wait_until_login_finish">Wait until login finish</string>
 
     
     <string name="btn_audio_call">AUDIO CALL</string>
@@ -41,6 +46,9 @@
     <string name="failed">Failed</string>
     <string name="WIFI_DISABLED">Call was stoped because connection was lost</string>
     <string name="NETWORK_ABSENT">Connection lost</string>
+    <string name="dialog_title">Quit the application?</string>
+    <string name="positive_response">Log out and exit</string>
+    <string name="negative_response">Minimize application</string>
 
     //Colors
     <color name="white">#FFFFFF</color>
