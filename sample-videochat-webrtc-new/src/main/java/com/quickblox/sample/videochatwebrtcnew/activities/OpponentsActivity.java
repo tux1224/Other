@@ -207,6 +207,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -214,13 +215,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.log_out:
-                try {
-                    QBRTCClient.getInstance().close(true);
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-                finish();
+                    showLogOutDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -279,5 +274,28 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         Intent intent = new Intent(this, ListUsersActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
+    }
+
+    private void showLogOutDialog(){
+        AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
+        quitDialog.setTitle(R.string.want_to_log_out);
+
+        quitDialog.setPositiveButton(R.string.positive_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                stopIncomeCallListenerService();
+                startListUsersActivity();
+                finish();
+            }
+        });
+
+        quitDialog.setNegativeButton(R.string.negative_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        quitDialog.show();
+
     }
 }

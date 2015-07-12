@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,24 +50,31 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
-        setContentView(R.layout.activity_login);
 
-        initUI();
+        if (!QBChatService.isInitialized()) {
 
-        QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
+            Fabric.with(this, new Crashlytics());
+            setContentView(R.layout.activity_login);
 
-        if (getActionBar() != null) {
-            getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
+            initUI();
+
+            QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
+
+            if (getActionBar() != null) {
+                getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
+            }
+
+            initUsersList();
+        } else {
+            startOpponentsActivity();
+            finish();
         }
-
-        initUsersList();
     }
 
     private void initUI() {
         usersList = (ListView) findViewById(R.id.usersListView);
-        loginPB = (ProgressBar) findViewById(R.id.loginPB);
-        loginPB.setVisibility(View.INVISIBLE);
+//        loginPB = (ProgressBar) findViewById(R.id.loginPB);
+//        loginPB.setVisibility(View.INVISIBLE);
 
     }
 
@@ -86,6 +94,8 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         usersListAdapter = new UsersAdapter(this, users);
         usersList.setAdapter(usersListAdapter);
         usersList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+
 
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -116,6 +126,12 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         if (progressDialog != null){
             progressDialog.dismiss();
         }
+        finish();
+    }
+
+    private void startOpponentsActivity(){
+        Intent intent = new Intent(ListUsersActivity.this, OpponentsActivity.class);
+        startActivity(intent);
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
@@ -684,5 +685,10 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         OpponentsAdapter.i = 0;
 //        stopIncomeCallListenerService();
     }
+
+    @Override
+    public void onAttachedToWindow() {
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD); }
 }
 

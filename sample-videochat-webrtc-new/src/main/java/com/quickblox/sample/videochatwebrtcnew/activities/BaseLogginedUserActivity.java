@@ -1,39 +1,47 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.quickblox.sample.videochatwebrtcnew.R;
-import com.quickblox.sample.videochatwebrtcnew.User;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.sample.videochatwebrtcnew.services.IncomeCallListenerService;
 import com.quickblox.users.model.QBUser;
 
-import java.util.ArrayList;
-
 
 /**
  * Created by tereha on 26.01.15.
  */
-public class BaseLogginedUserActivity extends Activity {
+public class BaseLogginedUserActivity extends AppCompatActivity {
 
     private static final String VERSION_NUMBER = "0.9.4.18062015";
     private static final String APP_VERSION = "App version";
-    static android.app.ActionBar mActionBar;
+    static ActionBar mActionBar;
     private Chronometer timerABWithTimer;
-    private boolean isStarted = false;
+    private boolean isTimerStarted = false;
     protected QBUser loginedUser;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
+        getSupportActionBar().setIcon(R.drawable.logo_qb);
+        getSupportActionBar().setTitle(R.string.app_name);
+    }
 
     protected void initActionBar() {
 
-        mActionBar = getActionBar();
+        mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowHomeEnabled(false);
         mActionBar.setDisplayShowTitleEnabled(false);
 
@@ -70,7 +78,7 @@ public class BaseLogginedUserActivity extends Activity {
     }
 
     public void initActionBarWithTimer() {
-        mActionBar = getActionBar();
+        mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowHomeEnabled(false);
         mActionBar.setDisplayShowTitleEnabled(false);
 
@@ -91,17 +99,17 @@ public class BaseLogginedUserActivity extends Activity {
     }
 
     public void startTimer() {
-        if (!isStarted) {
+        if (!isTimerStarted) {
             timerABWithTimer.setBase(SystemClock.elapsedRealtime());
             timerABWithTimer.start();
-            isStarted = true;
+            isTimerStarted = true;
         }
     }
 
     public void stopTimer(){
         if (timerABWithTimer != null){
             timerABWithTimer.stop();
-            isStarted = false;
+            isTimerStarted = false;
         }
     }
 
