@@ -21,6 +21,9 @@ public class Consts {
     public static final String CALL_TYPE_EXTRAS = "call_type";
     public static final String QBRTCSESSION_EXTRAS = "qbrtcsession";
     public static final String USER_INFO_EXTRAS = "user_info";
+    public static final String IS_SERVICE_AUTOSTARTED = "autostart";
+    public static final String SHARED_PREFERENCES = "preferences";
+
 
     public enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING

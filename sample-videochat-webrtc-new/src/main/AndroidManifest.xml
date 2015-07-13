@@ -25,15 +25,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.BaseLogginedUserActivity"
->
-
+            android:name=".activities.BaseLogginedUserActivity">
         </activity>
         <activity
             android:name=".activities.OpponentsActivity"
             android:taskAffinity="com.quickblox.sample.videochatwebrtc"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activities.CallActivity"
@@ -41,11 +38,21 @@
             android:taskAffinity="com.quickblox.sample.videochatwebrtc"
             android:screenOrientation="portrait">
         </activity>
+
         <service
             android:name=".services.IncomeCallListenerService">
         </service>
 
+        <receiver
+            android:enabled="true"
+            android:name=".services.AutoStartServiceBroadcastReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="io.fabric.ApiKey"
@@ -60,6 +67,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />

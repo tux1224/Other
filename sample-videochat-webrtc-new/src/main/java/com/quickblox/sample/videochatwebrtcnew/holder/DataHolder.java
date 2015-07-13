@@ -38,22 +38,21 @@ public class DataHolder {
         usersList.add(user);
     }
 
-    public static ArrayList<User> createUsersList() {
-        usersList = new ArrayList<>();
+    public static ArrayList<User> getUsersList() {
 
+        if (usersList == null) {
+            usersList = new ArrayList<>();
 
-
-
-        usersList.add(new User(1, "User 1", "webrtc_user1", PASSWORD, 2436251));
-        usersList.add(new User(2, "User 2", "webrtc_user2", PASSWORD, 2436254));
-        usersList.add(new User(3, "User 3", "webrtc_user3", PASSWORD, 2436257));
-        usersList.add(new User(4, "User 4", "webrtc_user4", PASSWORD, 2436258));
-        usersList.add(new User(5, "User 5", "webrtc_user5", PASSWORD, 2436259));
-        usersList.add(new User(6, "User 6", "webrtc_user6", PASSWORD, 2436262));
-        usersList.add(new User(7, "User 7", "webrtc_user7", PASSWORD, 2436263));
-        usersList.add(new User(8, "User 8", "webrtc_user8", PASSWORD, 2436265));
-        usersList.add(new User(9, "User 9", "webrtc_user9", PASSWORD, 2436266));
-        usersList.add(new User(10, "User 10", "webrtc_user10", PASSWORD, 2436269));
+            usersList.add(new User(1, "User 1", "webrtc_user1", PASSWORD, 2436251));
+            usersList.add(new User(2, "User 2", "webrtc_user2", PASSWORD, 2436254));
+            usersList.add(new User(3, "User 3", "webrtc_user3", PASSWORD, 2436257));
+            usersList.add(new User(4, "User 4", "webrtc_user4", PASSWORD, 2436258));
+            usersList.add(new User(5, "User 5", "webrtc_user5", PASSWORD, 2436259));
+            usersList.add(new User(6, "User 6", "webrtc_user6", PASSWORD, 2436262));
+            usersList.add(new User(7, "User 7", "webrtc_user7", PASSWORD, 2436263));
+            usersList.add(new User(8, "User 8", "webrtc_user8", PASSWORD, 2436265));
+            usersList.add(new User(9, "User 9", "webrtc_user9", PASSWORD, 2436266));
+            usersList.add(new User(10, "User 10", "webrtc_user10", PASSWORD, 2436269));
 //        usersList.add(new User(11, "Kate 1_1", "Kate_1_1", PASSWORD, 3571691));
 //        usersList.add(new User(12, "Kate 1_2", "Kate_1_2", PASSWORD, 3571751));
 //        usersList.add(new User(13, "Kate 2_1", "Kate_2_1", PASSWORD, 3571763));
@@ -62,6 +61,7 @@ public class DataHolder {
 //        usersList.add(new User(16, "My majesty 2", "My_majesty_2", PASSWORD, 3571784));
 //        usersList.add(new User(17, "Padavan 1", "Padavan_1", PASSWORD, 3571791));
 //        usersList.add(new User(18, "Padavan 2", "Padavan_2", PASSWORD, 3571794));
+        }
 
 
         return usersList;
@@ -70,7 +70,7 @@ public class DataHolder {
 
     public static String getUserNameByID(Integer callerID) {
 //        Log.d(TAG, "callerID " + callerID);
-        for (User user : usersList) {
+        for (User user : getUsersList()) {
 //            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return user.getFullName();
@@ -79,9 +79,20 @@ public class DataHolder {
         return "User_name_unused";
     }
 
+    public static String getUserNameByLogin(String login) {
+//        Log.d(TAG, "callerID " + callerID);
+        for (User user : getUsersList()) {
+//            Log.d(TAG, "getFullName " + user.getId());
+            if (user.getLogin().equals(login)) {
+                return user.getFullName();
+            }
+        }
+        return "User_name_unused";
+    }
+
     public static User getUserByID(Integer callerID) {
 //        Log.d(TAG, "callerID " + callerID);
-        for (User user : usersList) {
+        for (User user : getUsersList()) {
 //            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return user;
@@ -92,7 +103,7 @@ public class DataHolder {
 
     public static int getUserIndexByID(Integer callerID) {
 //        Log.d(TAG, "callerID " + callerID);
-        for (User user : usersList) {
+        for (User user : getUsersList()) {
 //            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return usersList.indexOf(user);
@@ -103,7 +114,7 @@ public class DataHolder {
 
     public static int getUserIndexByFullName(String fullName) {
 //        Log.d(TAG, "callerID " + fullName);
-        for (User user : usersList) {
+        for (User user : getUsersList()) {
 //            Log.d(TAG, "getFullName " + user.getFullName());
             if (user.getFullName().equals(fullName)) {
                 return usersList.indexOf(user);

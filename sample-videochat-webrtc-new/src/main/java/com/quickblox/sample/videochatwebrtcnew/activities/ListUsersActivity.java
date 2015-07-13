@@ -1,12 +1,8 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -14,22 +10,14 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
-import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.core.QBSettings;
 import com.quickblox.sample.videochatwebrtcnew.R;
-import com.quickblox.sample.videochatwebrtcnew.SharedPreferencesManager;
 import com.quickblox.sample.videochatwebrtcnew.User;
 import com.quickblox.sample.videochatwebrtcnew.adapters.UsersAdapter;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
-import com.quickblox.sample.videochatwebrtcnew.services.IncomeCallListenerService;
-import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -43,7 +31,7 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     private UsersAdapter usersListAdapter;
     private ListView usersList;
     private ProgressBar loginPB;
-    private static ArrayList<User> users = DataHolder.createUsersList();
+    private static ArrayList<User> users = DataHolder.getUsersList();
     private ProgressDialog progressDialog;
 
 
@@ -57,13 +45,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
             setContentView(R.layout.activity_login);
 
             initUI();
-
-            QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
-
-            if (getActionBar() != null) {
-                getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
-            }
-
             initUsersList();
         } else {
             startOpponentsActivity();
@@ -73,9 +54,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
 
     private void initUI() {
         usersList = (ListView) findViewById(R.id.usersListView);
-//        loginPB = (ProgressBar) findViewById(R.id.loginPB);
-//        loginPB.setVisibility(View.INVISIBLE);
-
     }
 
     public static int getUserIndex(int id) {

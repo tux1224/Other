@@ -51,7 +51,7 @@
     <string name="positive_response">Log out</string>
     <string name="negative_response">Minimize</string>
     <string name="want_to_log_out">You want to log out from the application</string>
-    <string name="positive_button">Yes</string>
+    <string name="positive_button">Ok</string>
     <string name="negative_button">Cancel</string>
 
     //Colors

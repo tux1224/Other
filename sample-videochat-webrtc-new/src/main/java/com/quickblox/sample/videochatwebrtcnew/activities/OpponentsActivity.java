@@ -3,6 +3,7 @@ package com.quickblox.sample.videochatwebrtcnew.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.util.Log;
@@ -255,6 +256,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 stopIncomeCallListenerService();
+                clearUserDataFromPreferences();
                 startListUsersActivity();
                 finish();
             }
@@ -284,6 +286,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 stopIncomeCallListenerService();
+                clearUserDataFromPreferences();
                 startListUsersActivity();
                 finish();
             }
@@ -297,5 +300,12 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
         quitDialog.show();
 
+    }
+    private void clearUserDataFromPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor ed = sharedPreferences.edit();
+        ed.remove(Consts.USER_LOGIN);
+        ed.remove(Consts.USER_PASSWORD);
+        ed.commit();
     }
 }
