@@ -80,8 +80,9 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
 
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
-                initProgressDialog();
+//                initProgressDialog();
                 startIncomeCallListenerService(login, password);
+//                finish();
 
 //                createSession(login, password);
             }
@@ -129,13 +130,14 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
 
     @Override
     protected void onStop() {
-        hideProgressDialog();
+//        hideProgressDialog();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        hideProgressDialog();
+//        hideProgressDialog();
+        finish();
         super.onDestroy();
     }
 }

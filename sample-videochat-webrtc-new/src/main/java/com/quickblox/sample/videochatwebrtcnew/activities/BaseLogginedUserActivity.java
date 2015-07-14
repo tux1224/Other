@@ -36,16 +36,19 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
+//        QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
+        if (QBChatService.isInitialized()) {
+            if (QBChatService.getInstance().isLoggedIn()) {
+                loginedUser = QBChatService.getInstance().getUser();
+            }
+        }
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE);
         getSupportActionBar().setIcon(R.drawable.logo_qb);
         getSupportActionBar().setTitle(R.string.app_name);
-
-
     }
 
-    protected void initActionBar() {
+    public void initActionBar() {
 
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowHomeEnabled(false);
@@ -105,7 +108,7 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     }
 
     public void startTimer() {
-        if (!isTimerStarted) {
+        if (!isTimerStarted && timerABWithTimer != null) {
             timerABWithTimer.setBase(SystemClock.elapsedRealtime());
             timerABWithTimer.start();
             isTimerStarted = true;

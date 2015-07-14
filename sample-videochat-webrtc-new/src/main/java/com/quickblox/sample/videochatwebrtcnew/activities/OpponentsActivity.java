@@ -56,7 +56,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_opponents);
 
-        loginedUser = QBChatService.getInstance().getUser();
+//        loginedUser = QBChatService.getInstance().getUser();
 
         initActionBar();
         initUI();
@@ -85,7 +85,8 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
         if (users == null) {
             List<String> tags = new LinkedList<>();
-            tags.add("webrtcusers");
+//            tags.add("webrtcusers");
+            tags.add("webrtc");
             QBUsers.getUsersByTags(tags, requestBuilder, new QBEntityCallback<ArrayList<QBUser>>() {
                 @Override
                 public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {

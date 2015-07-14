@@ -93,7 +93,7 @@ public class ConversationFragment extends Fragment implements Serializable {
         this.container = container;
         Log.d(TAG, "Fragment. Thread id: " + Thread.currentThread().getId());
 
-//        ((CallActivity) getActivity()).initActionBarWithTimer();
+        ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
             opponents = getArguments().getIntegerArrayList(ApplicationSingleton.OPPONENTS);
@@ -155,7 +155,7 @@ public class ConversationFragment extends Fragment implements Serializable {
 
         super.onStart();
         QBRTCSession session = SessionManager.getCurrentSession();
-//        if (!isMessageProcessed) {
+        if (!isMessageProcessed) {
             if (startReason == StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
                 Log.d(TAG, "acceptCall() from " + TAG);
                 session.acceptCall(session.getUserInfo());
@@ -164,8 +164,8 @@ public class ConversationFragment extends Fragment implements Serializable {
                 session.startCall(session.getUserInfo());
                 startOutBeep();
             }
-//            isMessageProcessed = true;
-//        }
+            isMessageProcessed = true;
+        }
     }
 
     private void startOutBeep() {
@@ -284,7 +284,7 @@ public class ConversationFragment extends Fragment implements Serializable {
         cameraToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (((CallActivity) getActivity()).getCurrentSession() != null) {
+                if (SessionManager.getCurrentSession() != null) {
                     if (cameraState != CameraState.DISABLED_FROM_USER) {
                         toggleCamera(false);
                         cameraState = CameraState.DISABLED_FROM_USER;
@@ -292,7 +292,7 @@ public class ConversationFragment extends Fragment implements Serializable {
                         toggleCamera(true);
                         cameraState = CameraState.ENABLED_FROM_USER;
                     }
-//                }
+                }
 
             }
         });

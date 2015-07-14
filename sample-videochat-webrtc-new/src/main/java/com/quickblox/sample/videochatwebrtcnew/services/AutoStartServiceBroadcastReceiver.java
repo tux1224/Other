@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
@@ -20,10 +21,10 @@ public class AutoStartServiceBroadcastReceiver extends BroadcastReceiver {
         String login = sharedPreferences.getString(Consts.USER_LOGIN, null);
         String password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
 
-        Log.d(TAG, "login = " + login+ "password = " + password);
-
-        if (login != null && password != null) {
-            sharedPreferences.edit().putBoolean(Consts.IS_SERVICE_AUTOSTARTED, true);
+        if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(Consts.IS_SERVICE_AUTOSTARTED, true);
+            editor.commit();
 
             Intent serviceIntent = new Intent(context, IncomeCallListenerService.class);
             serviceIntent.putExtra(Consts.USER_LOGIN, login);
@@ -32,6 +33,7 @@ public class AutoStartServiceBroadcastReceiver extends BroadcastReceiver {
         }
 
         Log.d(TAG, "onReceive " + intent.getAction());
+        Log.d(TAG, "login = " + login+ " password = " + password + " isAutoStarted = " + sharedPreferences.getBoolean(Consts.IS_SERVICE_AUTOSTARTED, false));
     }
 }
 

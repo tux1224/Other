@@ -71,17 +71,17 @@ public class IncomeCallFragment extends Fragment implements Serializable {
             Log.d(TAG, conferenceType.toString() + "From onCreateView()");
         }
 
-//        if (savedInstanceState == null) {
+        if (savedInstanceState == null) {
 
             view = inflater.inflate(R.layout.fragment_income_call, container, false);
 
-//            ((CallActivity) getActivity()).initActionBar();
+            ((CallActivity) getActivity()).initActionBar();
 
             initUI(view);
             setDisplayedTypeCall(conferenceType);
             initButtonsListener();
 
-//        }
+        }
 
         return view;
     }

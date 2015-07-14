@@ -11,7 +11,8 @@ public class DataHolder {
 
     private static final String TAG = DataHolder.class.getSimpleName();
     public static ArrayList<User> usersList;
-    public static final String PASSWORD = "x6Bt0VDy5";
+//    public static final String PASSWORD = "x6Bt0VDy5";
+    public static final String PASSWORD = "88888888";
 
 
     public void setUsersList(List<User> UsersList) {
@@ -43,10 +44,14 @@ public class DataHolder {
         if (usersList == null) {
             usersList = new ArrayList<>();
 
-            usersList.add(new User(1, "User 1", "webrtc_user1", PASSWORD, 2436251));
-            usersList.add(new User(2, "User 2", "webrtc_user2", PASSWORD, 2436254));
-            usersList.add(new User(3, "User 3", "webrtc_user3", PASSWORD, 2436257));
-            usersList.add(new User(4, "User 4", "webrtc_user4", PASSWORD, 2436258));
+            usersList.add(new User(1, "User 1", "user_1", PASSWORD, 2224038));
+            usersList.add(new User(2, "User 2", "user_2", PASSWORD, 2224046));
+            usersList.add(new User(3, "User 3", "user_3", PASSWORD, 2224047));
+            usersList.add(new User(4, "User 4", "user_4", PASSWORD, 2224050));
+//            usersList.add(new User(1, "User 1", "webrtc_user1", PASSWORD, 2436251));
+//            usersList.add(new User(2, "User 2", "webrtc_user2", PASSWORD, 2436254));
+//            usersList.add(new User(3, "User 3", "webrtc_user3", PASSWORD, 2436257));
+//            usersList.add(new User(4, "User 4", "webrtc_user4", PASSWORD, 2436258));
             usersList.add(new User(5, "User 5", "webrtc_user5", PASSWORD, 2436259));
             usersList.add(new User(6, "User 6", "webrtc_user6", PASSWORD, 2436262));
             usersList.add(new User(7, "User 7", "webrtc_user7", PASSWORD, 2436263));
