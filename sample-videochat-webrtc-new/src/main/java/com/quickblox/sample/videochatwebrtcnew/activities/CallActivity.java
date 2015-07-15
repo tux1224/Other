@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.fragments.ConversationFragment;
 import com.quickblox.sample.videochatwebrtcnew.fragments.IncomeCallFragment;
 //import com.quickblox.sample.videochatwebrtcnew.fragments.OpponentsFragment;
+import com.quickblox.sample.videochatwebrtcnew.fragments.VideoConversationFragment;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -57,7 +59,7 @@ import java.util.concurrent.TimeUnit;
  * Created by tereha on 16.02.15.
  *
  */
-public class CallActivity extends BaseLogginedUserActivity implements QBRTCClientSessionCallbacks, QBRTCClientConnectionCallbacks, QBRTCClientVideoTracksCallbacks {
+public class CallActivity extends BaseLogginedUserActivity implements QBRTCClientSessionCallbacks, QBRTCClientConnectionCallbacks/*, QBRTCClientVideoTracksCallbacks*/ {
 
 
     private static final String TAG = CallActivity.class.getSimpleName();
@@ -90,10 +92,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     private List<Integer> opponentsList;
     private Map<String, String> userInfo;
     int counterCallbaks;
-
-    public static CallActivity getInstance(){
-        return new CallActivity();
-    }
+    private MediaPlayer ringtone;
 
     public static void start(Context context, QBRTCTypes.QBConferenceType qbConferenceType,
                              List<Integer> opponentsIds, Map<String, String> userInfo,
@@ -112,8 +111,6 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        loginedUser = QBChatService.getInstance().getUser();
-
         initQBRTCConnectionListener();
         initWiFiManagerListener();
 
@@ -129,9 +126,6 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             Log.d(TAG, "onCreate()" + call_direction_type);
             addConversationFragmentStartCall(opponentsList, call_type, userInfo);
         }
-
-
-
 
         Log.d(TAG, "Activity. Thread id: " + Thread.currentThread().getId());
     }
@@ -167,7 +161,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         // Add activity as callback to RTCClient
         QBRTCClient.getInstance().addSessionCallbacksListener(this);
         QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-        QBRTCClient.getInstance().addVideoTrackCallbacksListener(this);
+//        QBRTCClient.getInstance().addVideoTrackCallbacksListener(this);
     }
 
     private void initWiFiManagerListener() {
@@ -190,7 +184,8 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     Log.d(TAG, "currentSession NOT null");
                     // Close session safely
                     disableConversationFragmentButtons();
-                    stopConversationFragmentBeeps();
+//                    stopConversationFragmentBeeps();
+                    stopOutBeep();
 
                     hangUpCurrentSession();
 
@@ -208,12 +203,12 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         }
     }
 
-    private void stopConversationFragmentBeeps() {
-        ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
-        if (fragment != null) {
-            fragment.stopOutBeep();
-        }
-    }
+//    private void stopConversationFragmentBeeps() {
+//        ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
+//        if (fragment != null) {
+//            fragment.stopOutBeep();
+//        }
+//    }
 
     private void disableConversationFragmentButtons() {
         ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
@@ -233,7 +228,8 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     ConversationFragment conversationFragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
                     if (conversationFragment != null) {
                         disableConversationFragmentButtons();
-                        stopConversationFragmentBeeps();
+//                        stopConversationFragmentBeeps();
+                        stopOutBeep();
                         hangUpCurrentSession();
                     }
                 } else {
@@ -290,6 +286,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     @Override
     protected void onStop() {
         super.onStop();
+        startOutBeep();
         unregisterReceiver(wifiStateReceiver);
     }
 
@@ -359,10 +356,11 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
 //        setStateTitle(userID, R.string.checking, View.VISIBLE);
         showToast(R.string.checking);
-        ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
-                if (fragment != null) {
-                    fragment.stopOutBeep();
-                }
+//        ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
+//                if (fragment != null) {
+//                    fragment.stopOutBeep();
+//                }
+        stopOutBeep();
 
 //        runOnUiThread(new Runnable() {
 //            @Override
@@ -379,42 +377,43 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     @Override
     public void onCallRejectByUser(QBRTCSession session, Integer userID, Map<String, String> userInfo) {
         showToast(R.string.rejected);
+        stopOutBeep();
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
-                if (fragment != null) {
-                    fragment.stopOutBeep();
-                }
-
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                ConversationFragment fragment = (ConversationFragment) getFragmentManager().findFragmentByTag(CONVERSATION_CALL_FRAGMENT);
+//                if (fragment != null) {
+//                    fragment.stopOutBeep();
+//                }
+//
+//            }
+//        });
         finish();
     }
 
-    @Override
-    public void onLocalVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack) {
-        localVideoVidew = (QBGLVideoView) findViewById(R.id.localVideoVidew);
-        Log.d(TAG, "localVideoVidew is " + localVideoVidew);
-        if (localVideoVidew != null) {
-            videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(localVideoVidew, QBGLVideoView.Endpoint.LOCAL)));
-            localVideoVidew.setVideoTrack(videoTrack, QBGLVideoView.Endpoint.LOCAL);
-            Log.d(TAG, "onLocalVideoTrackReceive() is raned");
-        }
-    }
+//    @Override
+//    public void onLocalVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack) {
+////        localVideoVidew = (QBGLVideoView) findViewById(R.id.localVideoVidew);
+////        Log.d(TAG, "localVideoVidew is " + localVideoVidew);
+////        if (localVideoVidew != null) {
+////            videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(localVideoVidew, QBGLVideoView.Endpoint.LOCAL)));
+////            localVideoVidew.setVideoTrack(videoTrack, QBGLVideoView.Endpoint.LOCAL);
+////            Log.d(TAG, "onLocalVideoTrackReceive() is raned");
+////        }
+//    }
 
-    @Override
-    public void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID) {
-        remoteVideoView = (QBGLVideoView) findViewById(R.id.remoteVideoView);
-        Log.d(TAG, "remoteVideoView is " + remoteVideoView);
-        if (remoteVideoView != null) {
-            VideoRenderer remouteRenderer = new VideoRenderer(new VideoCallBacks(remoteVideoView, QBGLVideoView.Endpoint.REMOTE));
-            videoTrack.addRenderer(remouteRenderer);
-            remoteVideoView.setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
-            Log.d(TAG, "onRemoteVideoTrackReceive() is raned");
-        }
-    }
+//    @Override
+//    public void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID) {
+////        remoteVideoView = (QBGLVideoView) findViewById(R.id.remoteVideoView);
+////        Log.d(TAG, "remoteVideoView is " + remoteVideoView);
+////        if (remoteVideoView != null) {
+////            VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(remoteVideoView, QBGLVideoView.Endpoint.REMOTE));
+////            videoTrack.addRenderer(remoteRenderer);
+////            remoteVideoView.setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
+////            Log.d(TAG, "onRemoteVideoTrackReceive() is raned");
+////        }
+//    }
 
     @Override
     public void onConnectionClosedForUser(QBRTCSession session, Integer userID) {
@@ -516,6 +515,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
     @Override
     public void onSessionStartClose(final QBRTCSession session) {
+        stopOutBeep();
         Log.d(TAG, "Start stopping session");
 
         runOnUiThread(new Runnable() {
@@ -633,14 +633,15 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                                                  QBRTCTypes.QBConferenceType qbConferenceType,
                                                  Map<String, String> userInfo) {
 
-//        initActionBarWithTimer();
+        startOutBeep();
         // init session for new call
         try {
             QBRTCSession newSessionWithOpponents = QBRTCClient.getInstance().createNewSessionWithOpponents(opponents, qbConferenceType);
             Log.d("Crash", "addConversationFragmentStartCall. Set session " + newSessionWithOpponents);
             SessionManager.setCurrentSession(newSessionWithOpponents);
 
-            ConversationFragment fragment = new ConversationFragment();
+//            ConversationFragment fragment = new ConversationFragment();
+            VideoConversationFragment fragment = new VideoConversationFragment();
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList(ApplicationSingleton.OPPONENTS,
                     new ArrayList<>(opponents));
@@ -674,7 +675,8 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             opponentsWithoutMe.add(session.getCallerID());
 
             // init conversation fragment
-            ConversationFragment fragment = new ConversationFragment();
+//            ConversationFragment fragment = new ConversationFragment();
+            VideoConversationFragment fragment = new VideoConversationFragment();
             Bundle bundle = new Bundle();
             bundle.putIntegerArrayList(ApplicationSingleton.OPPONENTS,
                     opponentsWithoutMe);
@@ -695,6 +697,8 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, CONVERSATION_CALL_FRAGMENT).commit();
         }
     }
+
+
 
     public static enum StartConversetionReason {
         INCOME_CALL_FOR_ACCEPTION,
@@ -717,6 +721,30 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 //            }
 //        }
 //    }
+
+    private void startOutBeep() {
+        ringtone = MediaPlayer.create(this, R.raw.beep);
+        ringtone.setLooping(true);
+        ringtone.start();
+
+    }
+
+    public void stopOutBeep() {
+
+        if (ringtone != null) {
+            try {
+                ringtone.stop();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ringtone.release();
+            ringtone = null;
+        }
+    }
+
+
 
     @Override
     protected void onDestroy() {

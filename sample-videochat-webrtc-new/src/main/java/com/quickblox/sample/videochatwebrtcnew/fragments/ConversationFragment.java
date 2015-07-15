@@ -77,7 +77,7 @@ public class ConversationFragment extends Fragment implements Serializable {
     private String callerName;
     private LinearLayout noVideoImageContainer;
     private boolean isMessageProcessed;
-    private MediaPlayer ringtone;
+
     private View localVideoView;
     private View remoteVideoView;
     private IntentFilter intentFilter;
@@ -162,33 +162,13 @@ public class ConversationFragment extends Fragment implements Serializable {
             } else {
                 Log.d(TAG, "startCall() from " + TAG);
                 session.startCall(session.getUserInfo());
-                startOutBeep();
+//                startOutBeep();
             }
             isMessageProcessed = true;
         }
     }
 
-    private void startOutBeep() {
-        ringtone = MediaPlayer.create(getActivity(), R.raw.beep);
-        ringtone.setLooping(true);
-        ringtone.start();
 
-    }
-
-    public void stopOutBeep() {
-
-        if (ringtone != null) {
-            try {
-                ringtone.stop();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ringtone.release();
-            ringtone = null;
-        }
-    }
 
 
     @Override
@@ -220,9 +200,9 @@ public class ConversationFragment extends Fragment implements Serializable {
 
         handUpVideoCall = (ImageButton) view.findViewById(R.id.handUpVideoCall);
         incUserName = (TextView) view.findViewById(R.id.incUserName);
-        incUserName.setText(callerName);
+        incUserName.setText(DataHolder.getUserNameByID(opponents.get(0)));
         incUserName.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
-                DataHolder.getUserIndexByFullName(callerName)) + 1));
+                DataHolder.getUserIndexByID(opponents.get(0))) + 1));
 
         noVideoImageContainer = (LinearLayout) view.findViewById(R.id.noVideoImageContainer);
         imgMyCameraOff = (ImageView) view.findViewById(R.id.imgMyCameraOff);
@@ -259,7 +239,7 @@ public class ConversationFragment extends Fragment implements Serializable {
     public void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
-        stopOutBeep();
+//        stopOutBeep();
         getActivity().unregisterReceiver(audioStreamReceiver);
     }
 
@@ -327,7 +307,7 @@ public class ConversationFragment extends Fragment implements Serializable {
         handUpVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopOutBeep();
+//                stopOutBeep();
                 actionButtonsEnabled(false);
                 handUpVideoCall.setEnabled(false);
                 Log.d(TAG, "Call is stopped");

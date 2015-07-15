@@ -2,12 +2,11 @@ package com.quickblox.sample.videochatwebrtcnew.services;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -24,7 +23,6 @@ import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
-import com.quickblox.sample.videochatwebrtcnew.SharedPreferencesManager;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.OpponentsActivity;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
@@ -48,7 +46,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private QBChatService chatService;
     private String login;
     private String password;
-    private ProgressDialog progressDialog;
+    private PendingIntent pendingIntent;
 
     @Override
     public void onCreate() {
@@ -59,7 +57,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Service started");
-        initProgressDialog();
 
         if (!QBChatService.isInitialized()) {
             Log.d(TAG, "!QBChatService.isInitialized()");
@@ -69,7 +66,9 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
         if (intent.getExtras()!= null) {
             parseIntentExtras(intent);
+            pendingIntent = intent.getParcelableExtra(Consts.PARAM_PINTENT);
         }
+
 
         if(!QBChatService.getInstance().isLoggedIn()){
             createSession(login, password);
@@ -139,9 +138,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
                 if (chatService.isLoggedIn()) {
                     Log.d(TAG, "chatService.isLoggedIn()");
-                    initQBRTCClient();
-                    startOpponentsActivity();
-                    saveUserDataToPreferences(login, password);
+                    startActionsOnSuccessLogin(login, password);
                 } else {
                     Log.d(TAG, "!chatService.isLoggedIn()");
                     chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
@@ -149,22 +146,18 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                         @Override
                         public void onSuccess(QBUser result, Bundle params) {
                             Log.d(TAG, "onSuccess login to chat with params");
-                            initQBRTCClient();
-                            startOpponentsActivity();
-                            saveUserDataToPreferences(login, password);
+                            startActionsOnSuccessLogin(login, password);
                         }
 
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "onSuccess login to chat");
-                            initQBRTCClient();
-                            startOpponentsActivity();
-                            saveUserDataToPreferences(login, password);
+                            startActionsOnSuccessLogin(login, password);
                         }
 
                         @Override
                         public void onError(List errors) {
-                            hideProgressDialog();
+                            sendResultToActivity(false);
                             Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
                             for (Object error : errors) {
                                 Log.d(TAG, error.toString());
@@ -172,7 +165,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                         }
                     });
                 }
-
             }
 
             @Override
@@ -183,10 +175,17 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
             @Override
             public void onError(List<String> errors) {
-                hideProgressDialog();
+                sendResultToActivity(false);
                 Toast.makeText(IncomeCallListenerService.this, "Error when login, check test users login and password", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void startActionsOnSuccessLogin(String login, String password) {
+        initQBRTCClient();
+        startOpponentsActivity();
+        sendResultToActivity(true);
+        saveUserDataToPreferences(login, password);
     }
 
     private void saveUserDataToPreferences(String login, String password){
@@ -219,21 +218,12 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         editor.commit();
     }
 
-    private void initProgressDialog() {
-        progressDialog = new ProgressDialog(this) {
-            @Override
-            public void onBackPressed() {
-                Toast.makeText(IncomeCallListenerService.this, getString(R.string.wait_until_login_finish), Toast.LENGTH_SHORT).show();
-            }
-        };
-        progressDialog.setMessage(getString(R.string.processes_login));
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
+    private void sendResultToActivity (boolean isSuccess){
+        try {
+            Intent intent = new Intent().putExtra(Consts.LOGIN_RESULT, isSuccess);
+            pendingIntent.send(IncomeCallListenerService.this, Consts.LOGIN_RESULT_CODE, intent);
+        } catch (PendingIntent.CanceledException e) {
+            e.printStackTrace();
         }
     }
 
@@ -261,7 +251,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {
-        if (qbrtcSession.equals(SessionManager.getCurrentSession())){
+        if (SessionManager.getCurrentSession() != null && !qbrtcSession.equals(SessionManager.getCurrentSession())){
             qbrtcSession.rejectCall(qbrtcSession.getUserInfo());
         } else {
             SessionManager.setCurrentSession(qbrtcSession);

@@ -17,8 +17,8 @@
         android:textOff=""
         android:textOn=""
         android:background="@drawable/ic_toggle_camera"
-
-        android:checked="true"/>
+        android:checked="true"
+        android:visibility="invisible"/>
 
     <ToggleButton
         android:id="@+id/dynamicToggleVideoCall"
@@ -27,7 +27,6 @@
         android:textOff=""
         android:textOn=""
         android:background="@drawable/ic_toggle_dynamic"
-
         android:checked="true"/>
 
     <ToggleButton
@@ -38,7 +37,6 @@
         android:textOn=""
         android:background="@drawable/ic_toggle_mic"
         android:gravity="center_vertical|center_horizontal"
-
         android:checked="true"/>
 
     <ImageButton

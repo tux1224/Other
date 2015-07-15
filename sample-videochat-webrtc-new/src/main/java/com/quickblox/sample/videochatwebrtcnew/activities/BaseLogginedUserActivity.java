@@ -1,6 +1,7 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -12,7 +13,6 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.core.QBSettings;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
@@ -36,7 +36,6 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
         if (QBChatService.isInitialized()) {
             if (QBChatService.getInstance().isLoggedIn()) {
                 loginedUser = QBChatService.getInstance().getUser();
@@ -123,9 +122,12 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     }
 
     public void startIncomeCallListenerService(String login, String password){
+        Intent tempIntent = new Intent(this, IncomeCallListenerService.class);
+        PendingIntent pendingIntent = createPendingResult(Consts.LOGIN_TASK_CODE, tempIntent, 0);
         Intent intent = new Intent(this, IncomeCallListenerService.class);
         intent.putExtra(Consts.USER_LOGIN, login);
         intent.putExtra(Consts.USER_PASSWORD, password);
+        intent.putExtra(Consts.PARAM_PINTENT, pendingIntent);
         startService(intent);
     }
 

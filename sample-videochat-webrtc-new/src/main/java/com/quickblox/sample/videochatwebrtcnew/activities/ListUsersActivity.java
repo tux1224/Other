@@ -30,7 +30,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     private static final String TAG = ListUsersActivity.class.getSimpleName();
     private UsersAdapter usersListAdapter;
     private ListView usersList;
-    private ProgressBar loginPB;
     private static ArrayList<User> users = DataHolder.getUsersList();
     private ProgressDialog progressDialog;
 
@@ -80,11 +79,8 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
 
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
-//                initProgressDialog();
+                initProgressDialog();
                 startIncomeCallListenerService(login, password);
-//                finish();
-
-//                createSession(login, password);
             }
         });
     }
@@ -101,11 +97,13 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         progressDialog.show();
     }
 
-    private void hideProgressDialog() {
+    private void hideProgressDialog(boolean isLoginSuccess) {
         if (progressDialog != null){
             progressDialog.dismiss();
+            if (isLoginSuccess) {
+                finish();
+            }
         }
-        finish();
     }
 
     private void startOpponentsActivity(){
@@ -125,19 +123,21 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
             if (resultCode == Consts.CALL_ACTIVITY_CLOSE_WIFI_DISABLED) {
                 Toast.makeText(this, getString(R.string.WIFI_DISABLED),Toast.LENGTH_LONG).show();
             }
+        } else if (resultCode == Consts.LOGIN_RESULT_CODE){
+            boolean isLoginSuccess = data.getBooleanExtra(Consts.LOGIN_RESULT, false);
+            hideProgressDialog(isLoginSuccess);
         }
     }
 
+
+
     @Override
     protected void onStop() {
-//        hideProgressDialog();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-//        hideProgressDialog();
-        finish();
         super.onDestroy();
     }
 }

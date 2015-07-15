@@ -11,6 +11,15 @@ public class Consts {
     public static final String EMPTY_STRING = "";
 
     public static final int CALL_ACTIVITY_CLOSE = 1000;
+    public final static int LOGIN_TASK_CODE = 1002;
+    public final static int LOGIN_RESULT_CODE = 1003;
+    public final static int RESULT_CODE_1 = 1;
+    public final static int RESULT_CODE_2 = 2;
+    public final static int RESULT_CODE_3 = 3;
+    ;
+
+    public final static String PARAM_PINTENT = "pendingIntent";
+    public final static String LOGIN_RESULT = "result";
 
     //Shared Preferences constants
     public static final String USER_LOGIN = "user_login";
@@ -27,6 +36,7 @@ public class Consts {
     public static final String USER_INFO_EXTRAS = "user_info";
     public static final String IS_SERVICE_AUTOSTARTED = "autostart";
     public static final String SHARED_PREFERENCES = "preferences";
+
 
 
     public enum CALL_DIRECTION_TYPE {
