@@ -10,6 +10,9 @@ public class Consts {
     public static final String AUTH_SECRET = "s4VCJZq4uWNer7H";
     public static final String EMPTY_STRING = "";
 
+    public final static String OPPONENTS = "opponents";
+    public static final String CONFERENCE_TYPE = "conference_type";
+
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;
     public final static int LOGIN_RESULT_CODE = 1003;

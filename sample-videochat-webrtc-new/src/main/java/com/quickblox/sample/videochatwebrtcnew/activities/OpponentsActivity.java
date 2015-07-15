@@ -56,8 +56,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_opponents);
 
-//        loginedUser = QBChatService.getInstance().getUser();
-
         initActionBar();
         initUI();
         initProgressDialog();

@@ -3,7 +3,6 @@ package com.quickblox.sample.videochatwebrtcnew.fragments;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,16 +39,6 @@ public class VideoConversationFragment extends BaseConversationFragment implemen
         super.onCreate(savedInstanceState);
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(this);
     }
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-////        super.onCreateView(inflater, container, savedInstanceState);
-//
-//        Log.d(TAG, "onCreateView");
-//
-////        initViews(view);
-////        return view;
-//    }
 
     @Override
     protected int getContentView() {

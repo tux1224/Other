@@ -19,15 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
 import com.quickblox.sample.videochatwebrtcnew.activities.BaseLogginedUserActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
-import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
+import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
-import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 
@@ -90,8 +87,8 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
-            opponents = getArguments().getIntegerArrayList(ApplicationSingleton.OPPONENTS);
-            qbConferenceType = getArguments().getInt(ApplicationSingleton.CONFERENCE_TYPE);
+            opponents = getArguments().getIntegerArrayList(Consts.OPPONENTS);
+            qbConferenceType = getArguments().getInt(Consts.CONFERENCE_TYPE);
             startReason = getArguments().getInt(CallActivity.START_CONVERSATION_REASON);
             sessionID = getArguments().getString(CallActivity.SESSION_ID);
             callerName = getArguments().getString(CallActivity.CALLER_NAME);

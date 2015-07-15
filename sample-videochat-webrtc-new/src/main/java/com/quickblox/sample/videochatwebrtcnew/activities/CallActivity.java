@@ -20,14 +20,12 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
 import com.quickblox.sample.videochatwebrtcnew.adapters.OpponentsAdapter;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.fragments.ConversationFragment;
 import com.quickblox.sample.videochatwebrtcnew.fragments.IncomeCallFragment;
-//import com.quickblox.sample.videochatwebrtcnew.fragments.OpponentsFragment;
 import com.quickblox.sample.videochatwebrtcnew.fragments.VideoConversationFragment;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
@@ -38,14 +36,9 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
-import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
-import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 
-import org.jivesoftware.smack.SmackException;
 import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.VideoRenderer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -620,7 +613,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             Bundle bundle = new Bundle();
             bundle.putSerializable("sessionDescription", session.getSessionDescription());
             bundle.putIntegerArrayList("opponents", new ArrayList<>(session.getOpponents()));
-            bundle.putInt(ApplicationSingleton.CONFERENCE_TYPE, session.getConferenceType().getValue());
+            bundle.putInt(Consts.CONFERENCE_TYPE, session.getConferenceType().getValue());
             fragment.setArguments(bundle);
             getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, INCOME_CALL_FRAGMENT).commit();
         } else {
@@ -643,9 +636,9 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 //            ConversationFragment fragment = new ConversationFragment();
             VideoConversationFragment fragment = new VideoConversationFragment();
             Bundle bundle = new Bundle();
-            bundle.putIntegerArrayList(ApplicationSingleton.OPPONENTS,
+            bundle.putIntegerArrayList(Consts.OPPONENTS,
                     new ArrayList<>(opponents));
-            bundle.putInt(ApplicationSingleton.CONFERENCE_TYPE, qbConferenceType.getValue());
+            bundle.putInt(Consts.CONFERENCE_TYPE, qbConferenceType.getValue());
             bundle.putInt(START_CONVERSATION_REASON, StartConversetionReason.OUTCOME_CALL_MADE.ordinal());
             bundle.putString(CALLER_NAME, DataHolder.getUserNameByID(newSessionWithOpponents.getCallerID()));
 
@@ -678,9 +671,9 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 //            ConversationFragment fragment = new ConversationFragment();
             VideoConversationFragment fragment = new VideoConversationFragment();
             Bundle bundle = new Bundle();
-            bundle.putIntegerArrayList(ApplicationSingleton.OPPONENTS,
+            bundle.putIntegerArrayList(Consts.OPPONENTS,
                     opponentsWithoutMe);
-            bundle.putInt(ApplicationSingleton.CONFERENCE_TYPE, session.getConferenceType().getValue());
+            bundle.putInt(Consts.CONFERENCE_TYPE, session.getConferenceType().getValue());
             bundle.putInt(START_CONVERSATION_REASON, StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal());
             bundle.putString(SESSION_ID, session.getSessionID());
             bundle.putString(CALLER_NAME, DataHolder.getUserNameByID(session.getCallerID()));

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -18,16 +17,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
 import com.quickblox.sample.videochatwebrtcnew.activities.BaseLogginedUserActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
+import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -96,8 +94,8 @@ public class ConversationFragment extends Fragment implements Serializable {
         ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
-            opponents = getArguments().getIntegerArrayList(ApplicationSingleton.OPPONENTS);
-            qbConferenceType = getArguments().getInt(ApplicationSingleton.CONFERENCE_TYPE);
+            opponents = getArguments().getIntegerArrayList(Consts.OPPONENTS);
+            qbConferenceType = getArguments().getInt(Consts.CONFERENCE_TYPE);
             startReason = getArguments().getInt(CallActivity.START_CONVERSATION_REASON);
             sessionID = getArguments().getString(CallActivity.SESSION_ID);
             callerName = getArguments().getString(CallActivity.CALLER_NAME);
