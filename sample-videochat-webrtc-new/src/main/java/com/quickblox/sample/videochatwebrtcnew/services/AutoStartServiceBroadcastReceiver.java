@@ -29,6 +29,7 @@ public class AutoStartServiceBroadcastReceiver extends BroadcastReceiver {
             Intent serviceIntent = new Intent(context, IncomeCallListenerService.class);
             serviceIntent.putExtra(Consts.USER_LOGIN, login);
             serviceIntent.putExtra(Consts.USER_PASSWORD, password);
+            serviceIntent.putExtra(Consts.IS_SERVICE_AUTOSTARTED, true);
             context.startService(serviceIntent);
         }
 

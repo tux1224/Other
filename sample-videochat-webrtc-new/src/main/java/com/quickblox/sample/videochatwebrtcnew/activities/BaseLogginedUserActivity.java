@@ -48,66 +48,71 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     }
 
     public void initActionBar() {
+        if (loginedUser != null) {
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
+            mActionBar = getSupportActionBar();
+            mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayShowTitleEnabled(false);
 
-        LayoutInflater mInflater = LayoutInflater.from(this);
+            LayoutInflater mInflater = LayoutInflater.from(this);
 
-        View mCustomView = mInflater.inflate(R.layout.actionbar_view, null);
+            View mCustomView = mInflater.inflate(R.layout.actionbar_view, null);
 
-        TextView numberOfListAB = (TextView) mCustomView.findViewById(R.id.numberOfListAB);
-        numberOfListAB.setBackgroundResource(resourceSelector(
-                DataHolder.getUserIndexByID(loginedUser.getId()) + 1));
-        numberOfListAB.setText(String.valueOf(
-                DataHolder.getUserIndexByID(loginedUser.getId()) + 1));
+            TextView numberOfListAB = (TextView) mCustomView.findViewById(R.id.numberOfListAB);
+            numberOfListAB.setBackgroundResource(resourceSelector(
+                    DataHolder.getUserIndexByID(loginedUser.getId()) + 1));
+            numberOfListAB.setText(String.valueOf(
+                    DataHolder.getUserIndexByID(loginedUser.getId()) + 1));
 
-        numberOfListAB.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(BaseLogginedUserActivity.this);
-                dialog.setTitle(APP_VERSION);
-                dialog.setMessage(VERSION_NUMBER);
-                dialog.show();
-                return true;
-            }});
+            numberOfListAB.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(BaseLogginedUserActivity.this);
+                    dialog.setTitle(APP_VERSION);
+                    dialog.setMessage(VERSION_NUMBER);
+                    dialog.show();
+                    return true;
+                }
+            });
 
-        TextView loginAsAB = (TextView) mCustomView.findViewById(R.id.loginAsAB);
-        loginAsAB.setText(R.string.logged_in_as);
+            TextView loginAsAB = (TextView) mCustomView.findViewById(R.id.loginAsAB);
+            loginAsAB.setText(R.string.logged_in_as);
 
 
-        TextView userNameAB = (TextView) mCustomView.findViewById(R.id.userNameAB);
-        userNameAB.setText(DataHolder.getUserNameByID(loginedUser.getId()));
+            TextView userNameAB = (TextView) mCustomView.findViewById(R.id.userNameAB);
+            userNameAB.setText(DataHolder.getUserNameByID(loginedUser.getId()));
 
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
+            mActionBar.setCustomView(mCustomView);
+            mActionBar.setDisplayShowCustomEnabled(true);
+        }
 
     }
 
     public void initActionBarWithTimer() {
-        mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
+        if (loginedUser != null) {
+            mActionBar = getSupportActionBar();
+            mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayShowTitleEnabled(false);
 
-        LayoutInflater mInflater = LayoutInflater.from(this);
+            LayoutInflater mInflater = LayoutInflater.from(this);
 
-        View mCustomView = mInflater.inflate(R.layout.actionbar_with_timer, null);
+            View mCustomView = mInflater.inflate(R.layout.actionbar_with_timer, null);
 
-        timerABWithTimer = (Chronometer) mCustomView.findViewById(R.id.timerABWithTimer);
+            timerABWithTimer = (Chronometer) mCustomView.findViewById(R.id.timerABWithTimer);
 
-        TextView loginAsABWithTimer = (TextView) mCustomView.findViewById(R.id.loginAsABWithTimer);
-        loginAsABWithTimer.setText(R.string.logged_in_as);
+            TextView loginAsABWithTimer = (TextView) mCustomView.findViewById(R.id.loginAsABWithTimer);
+            loginAsABWithTimer.setText(R.string.logged_in_as);
 
-        TextView userNameAB = (TextView) mCustomView.findViewById(R.id.userNameABWithTimer);
-        userNameAB.setText(DataHolder.getUserNameByID(loginedUser.getId()));
+            TextView userNameAB = (TextView) mCustomView.findViewById(R.id.userNameABWithTimer);
+            userNameAB.setText(DataHolder.getUserNameByID(loginedUser.getId()));
 
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
+            mActionBar.setCustomView(mCustomView);
+            mActionBar.setDisplayShowCustomEnabled(true);
+        }
     }
 
     public void startTimer() {
-        if (!isTimerStarted && timerABWithTimer != null) {
+        if (!isTimerStarted && timerABWithTimer != null && loginedUser != null) {
             timerABWithTimer.setBase(SystemClock.elapsedRealtime());
             timerABWithTimer.start();
             isTimerStarted = true;
@@ -127,6 +132,7 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
         Intent intent = new Intent(this, IncomeCallListenerService.class);
         intent.putExtra(Consts.USER_LOGIN, login);
         intent.putExtra(Consts.USER_PASSWORD, password);
+        intent.putExtra(Consts.IS_SERVICE_AUTOSTARTED, false);
         intent.putExtra(Consts.PARAM_PINTENT, pendingIntent);
         startService(intent);
     }

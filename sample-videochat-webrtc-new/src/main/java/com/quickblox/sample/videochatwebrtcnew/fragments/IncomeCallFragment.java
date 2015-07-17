@@ -200,4 +200,10 @@ public class IncomeCallFragment extends Fragment implements Serializable {
         super.onDestroy();
         Log.d(TAG, "onDestroy() from IncomeCallFragment");
     }
+
+    @Override
+    public void onDestroy() {
+//        ((CallActivity)getActivity()).rejectCurrentSession();
+        super.onDestroy();
+    }
 }

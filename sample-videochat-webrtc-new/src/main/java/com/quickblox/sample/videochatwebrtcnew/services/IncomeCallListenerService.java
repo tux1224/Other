@@ -3,7 +3,6 @@ package com.quickblox.sample.videochatwebrtcnew.services;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +28,7 @@ import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 
@@ -37,7 +37,6 @@ import org.jivesoftware.smack.SmackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by tereha on 08.07.15.
@@ -49,6 +48,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private String login;
     private String password;
     private PendingIntent pendingIntent;
+    private boolean isServiceAutostart;
 
     @Override
     public void onCreate() {
@@ -66,17 +66,18 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             chatService = QBChatService.getInstance();
         }
 
-        if (intent.getExtras()!= null) {
+        if (intent != null && intent.getExtras()!= null) {
             parseIntentExtras(intent);
             pendingIntent = intent.getParcelableExtra(Consts.PARAM_PINTENT);
         }
 
 
         if(!QBChatService.getInstance().isLoggedIn()){
+            QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
             createSession(login, password);
         }
 
-        startForeground(1, createNotification());
+//        startForeground(1, createNotification());
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -113,6 +114,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                 }
             }
         });
+        QBRTCConfig.setAnswerTimeInterval(Consts.ANSWER_TIME_INTERVAL);
 
         // Add activity as callback to RTCClient
         QBRTCClient.getInstance().addSessionCallbacksListener(this);
@@ -125,6 +127,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         Log.d(TAG, "parseIntentExtras()");
         login = intent.getStringExtra(Consts.USER_LOGIN);
         password = intent.getStringExtra(Consts.USER_PASSWORD);
+        isServiceAutostart = intent.getBooleanExtra(Consts.IS_SERVICE_AUTOSTARTED, false);
         Log.d(TAG, "login = " + login + " password = " + password);
     }
 
@@ -186,6 +189,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private void startActionsOnSuccessLogin(String login, String password) {
         initQBRTCClient();
         startOpponentsActivity();
+        startForeground(1, createNotification());
         sendResultToActivity(true);
         saveUserDataToPreferences(login, password);
     }
@@ -203,21 +207,13 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void startOpponentsActivity(){
-        boolean isServiceAutostarted = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE)
-                .getBoolean(Consts.IS_SERVICE_AUTOSTARTED, false);
-        if (!isServiceAutostarted) {
+        if (!isServiceAutostart) {
             Intent intent = new Intent(IncomeCallListenerService.this, OpponentsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
-        Log.d(TAG, " isAutoStarted = " + isServiceAutostarted);
-    }
-
-    private void resetAutoStartFlag(){
-        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(Consts.IS_SERVICE_AUTOSTARTED);
-        editor.commit();
+        Log.d(TAG, " isAutoStarted = " + isServiceAutostart);
+        isServiceAutostart = false;
     }
 
     private void sendResultToActivity (boolean isSuccess){
@@ -233,7 +229,8 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     public void onDestroy() {
         QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
         QBChatService.getInstance().destroy();
-        resetAutoStartFlag();
+        SessionManager.setCurrentSession(null);
+//        resetAutoStartFlag();
         super.onDestroy();
     }
 
@@ -282,7 +279,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
-//        SessionManager.setCurrentSession(null);
     }
 
     @Override

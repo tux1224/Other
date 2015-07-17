@@ -15,9 +15,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBSignaling;
-import com.quickblox.chat.QBWebRTCSignaling;
-import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.sample.videochatwebrtcnew.R;
@@ -26,10 +23,7 @@ import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-
-import org.jivesoftware.smack.SmackException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,8 +77,8 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
         if (users == null) {
             List<String> tags = new LinkedList<>();
-//            tags.add("webrtcusers");
-            tags.add("webrtc");
+            tags.add("webrtcusers");
+//            tags.add("webrtc");
             QBUsers.getUsersByTags(tags, requestBuilder, new QBEntityCallback<ArrayList<QBUser>>() {
                 @Override
                 public void onSuccess(ArrayList<QBUser> qbUsers, Bundle bundle) {
@@ -154,11 +148,12 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
             switch (v.getId()) {
                 case R.id.btnAudioCall:
                     qbConferenceType = QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
+                    setActionButtonsClickable(false);
                     break;
 
                 case R.id.btnVideoCall:
-                    // get call type
                     qbConferenceType = QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO;
+                    setActionButtonsClickable(false);
                     break;
             }
 
@@ -177,6 +172,11 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         } else if (opponentsAdapter.getSelected().size() < 1){
             Toast.makeText(this, getString(R.string.choose_one_opponent), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setActionButtonsClickable(boolean isClickable) {
+        btnAudioCall.setClickable(isClickable);
+        btnVideoCall.setClickable(isClickable);
     }
 
     public static ArrayList<Integer> getOpponentsIds(List<QBUser> opponents){
@@ -198,9 +198,15 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        setActionButtonsClickable(true);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-        if(progressDialog.isShowing()) {
+        if(progressDialog != null && progressDialog.isShowing()) {
             hideProgressDialog();
         }
     }
@@ -244,16 +250,17 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     }
     @Override
     public void onBackPressed() {
-        openQuitDialog();
+        showQuitDialog();
     }
 
-    private void openQuitDialog() {
+    private void showQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
         quitDialog.setTitle(R.string.dialog_title);
 
         quitDialog.setPositiveButton(R.string.positive_response, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                OpponentsAdapter.i = 0;
                 stopIncomeCallListenerService();
                 clearUserDataFromPreferences();
                 startListUsersActivity();
@@ -284,6 +291,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         quitDialog.setPositiveButton(R.string.positive_button, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                OpponentsAdapter.i = 0;
                 stopIncomeCallListenerService();
                 clearUserDataFromPreferences();
                 startListUsersActivity();

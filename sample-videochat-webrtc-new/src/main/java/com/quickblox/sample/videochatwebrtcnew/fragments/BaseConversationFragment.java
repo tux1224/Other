@@ -210,7 +210,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
                 }
                 break;
             case R.id.handUpVideoCall:
-//                stopOutBeep();
                 actionButtonsEnabled(false);
                 handUpVideoCall.setEnabled(false);
                 Log.d(TAG, "Call is stopped");
@@ -272,6 +271,12 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 //            opponentsFromCall.addView(opponentsFromCall.findViewById(userID));
 //        }
 //    }
+
+    @Override
+    public void onDestroy() {
+        ((CallActivity)getActivity()).hangUpCurrentSession();
+        super.onDestroy();
+    }
 
     private class AudioStreamReceiver extends BroadcastReceiver {
 
