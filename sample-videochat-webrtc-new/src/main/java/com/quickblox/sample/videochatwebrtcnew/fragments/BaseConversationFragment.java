@@ -27,10 +27,10 @@ import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by tereha on 15.07.15.
@@ -39,8 +39,8 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
     private static final String TAG = BaseConversationFragment.class.getSimpleName();
 
-    protected ArrayList<Integer> opponents;
-    protected int qbConferenceType;
+    protected List<Integer> opponents;
+    protected QBRTCTypes.QBConferenceType qbConferenceType;
     protected int startReason;
     protected String sessionID;
     protected String callerName;
@@ -51,9 +51,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
     private ToggleButton dynamicToggleVideoCall;
     private ToggleButton micToggleVideoCall;
     private ImageButton handUpVideoCall;
-    private TextView callerNameView;
-//    protected View view;
-    private Map<String, String> userInfo;
+    private TextView opponentNameView;
     private View opponentItemView;
     private HorizontalScrollView camerasOpponentsList;
     //    public static LinearLayout opponentsFromCall;
@@ -69,11 +67,9 @@ public abstract class BaseConversationFragment extends Fragment implements View.
     private LinearLayout noVideoImageContainer;
     private boolean isMessageProcessed;
     private MediaPlayer ringtone;
-    private View localVideoView;
-    private View remoteVideoView;
     private IntentFilter intentFilter;
     private AudioStreamReceiver audioStreamReceiver;
-
+    private Integer callerID;
 
 
     @Override
@@ -87,24 +83,32 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
-            opponents = getArguments().getIntegerArrayList(Consts.OPPONENTS);
-            qbConferenceType = getArguments().getInt(Consts.CONFERENCE_TYPE);
-            startReason = getArguments().getInt(CallActivity.START_CONVERSATION_REASON);
-            sessionID = getArguments().getString(CallActivity.SESSION_ID);
-            callerName = getArguments().getString(CallActivity.CALLER_NAME);
-
-            Log.d(TAG, "CALLER_NAME: " + callerName);
+            initCallData();
+            startReason = getArguments().getInt(Consts.CALL_DIRECTION_TYPE_EXTRAS);
+            Log.d(TAG, "CALLER_NAME: " + startReason);
 
         }
-
         initViews(view);
 //        createOpponentsList(opponents);
         return view;
     }
 
+    protected void initCallData() {
+        QBRTCSession session = SessionManager.getCurrentSession();
+        if (session != null){
+            opponents = session.getOpponents();
+            callerID = session.getCallerID();
+            callerName = DataHolder.getUserNameByID(session.getCallerID());
+            qbConferenceType = session.getConferenceType();
+            Log.d(TAG, "currentSession == null - " + String.valueOf(session == null));
+            Log.d(TAG, "opponents.size() - " + opponents.size());
+            Log.d(TAG, "currentSession != null - " + qbConferenceType);
+        }
+    }
+
     protected abstract int getContentView();
 
-    protected void actionButtonsEnabled(boolean enability) {
+    public void actionButtonsEnabled(boolean enability) {
 
         micToggleVideoCall.setEnabled(enability);
         dynamicToggleVideoCall.setEnabled(enability);
@@ -124,40 +128,17 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         super.onStart();
         QBRTCSession session = SessionManager.getCurrentSession();
         if (!isMessageProcessed) {
-            if (startReason == StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
+            if (startReason == Consts.CALL_DIRECTION_TYPE.INCOMING.ordinal()) {
                 Log.d(TAG, "acceptCall() from " + TAG);
                 session.acceptCall(session.getUserInfo());
             } else {
                 Log.d(TAG, "startCall() from " + TAG);
                 session.startCall(session.getUserInfo());
-                startOutBeep();
+//                startOutBeep();
             }
             isMessageProcessed = true;
         }
     }
-
-    private void startOutBeep() {
-        ringtone = MediaPlayer.create(getActivity(), R.raw.beep);
-        ringtone.setLooping(true);
-        ringtone.start();
-
-    }
-
-    public void stopOutBeep() {
-
-        if (ringtone != null) {
-            try {
-                ringtone.stop();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ringtone.release();
-            ringtone = null;
-        }
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -179,17 +160,23 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         micToggleVideoCall = (ToggleButton) view.findViewById(R.id.micToggleVideoCall);
         micToggleVideoCall.setOnClickListener(this);
 
-        callerNameView = (TextView) view.findViewById(R.id.incUserName);
-        callerNameView.setText(DataHolder.getUserNameByID(opponents.get(0)));
-        callerNameView.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
-                DataHolder.getUserIndexByID(opponents.get(0))) + 1));
+        if (startReason == Consts.CALL_DIRECTION_TYPE.OUTGOING.ordinal()) {
+            opponentNameView = (TextView) view.findViewById(R.id.incUserName);
+            opponentNameView.setText(DataHolder.getUserNameByID(opponents.get(0)));
+            opponentNameView.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
+                    DataHolder.getUserIndexByID(opponents.get(0))) + 1));
+        } else if (startReason == Consts.CALL_DIRECTION_TYPE.INCOMING.ordinal())  {
+            opponentNameView = (TextView) view.findViewById(R.id.incUserName);
+            opponentNameView.setText(DataHolder.getUserNameByID(callerID));
+            opponentNameView.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
+                    DataHolder.getUserIndexByID(callerID)) + 1));
+        }
 
         handUpVideoCall = (ImageButton) view.findViewById(R.id.handUpVideoCall);
         handUpVideoCall.setOnClickListener(this);
 
         noVideoImageContainer = (LinearLayout) view.findViewById(R.id.noVideoImageContainer);
 
-//        actionButtonsEnabled(false);
         Log.d(TAG, "initViews() from " + TAG);
     }
 
@@ -197,7 +184,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
     public void onStop() {
         Log.d(TAG, "onStop()");
         super.onStop();
-        stopOutBeep();
         getActivity().unregisterReceiver(audioStreamReceiver);
     }
 
@@ -224,7 +210,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
                 }
                 break;
             case R.id.handUpVideoCall:
-                stopOutBeep();
+//                stopOutBeep();
                 actionButtonsEnabled(false);
                 handUpVideoCall.setEnabled(false);
                 Log.d(TAG, "Call is stopped");
@@ -236,11 +222,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
             default:
                 break;
         }
-    }
-
-    public static enum StartConversetionReason {
-        INCOME_CALL_FOR_ACCEPTION,
-        OUTCOME_CALL_MADE;
     }
 
 //    private List<QBUser> getOpponentsFromCall(ArrayList<Integer> opponents) {
@@ -290,20 +271,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 //        } else {
 //            opponentsFromCall.addView(opponentsFromCall.findViewById(userID));
 //        }
-//    }
-
-//    private String getCallerName(QBRTCSession session) {
-//        String s = new String();
-//        int i = session.getCallerID();
-//
-//        allUsers.addAll(DataHolder.usersList);
-//
-//        for (QBUser usr : allUsers) {
-//            if (usr.getId().equals(i)) {
-//                s = usr.getFullName();
-//            }
-//        }
-//        return s;
 //    }
 
     private class AudioStreamReceiver extends BroadcastReceiver {

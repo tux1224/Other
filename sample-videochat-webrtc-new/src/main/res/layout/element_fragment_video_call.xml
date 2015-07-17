@@ -18,7 +18,7 @@
         android:textOn=""
         android:background="@drawable/ic_toggle_camera"
         android:checked="true"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
     <ToggleButton
         android:id="@+id/dynamicToggleVideoCall"

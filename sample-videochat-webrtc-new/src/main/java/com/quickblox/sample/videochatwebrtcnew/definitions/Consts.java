@@ -12,6 +12,8 @@ public class Consts {
 
     public final static String OPPONENTS = "opponents";
     public static final String CONFERENCE_TYPE = "conference_type";
+    public static final String INCOME_CALL_FRAGMENT = "income_call_fragment";
+    public static final String CONVERSATION_CALL_FRAGMENT = "conversation_call_fragment";
 
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;

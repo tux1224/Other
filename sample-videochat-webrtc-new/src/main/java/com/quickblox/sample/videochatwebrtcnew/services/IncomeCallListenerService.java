@@ -34,8 +34,10 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 
 import org.jivesoftware.smack.SmackException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by tereha on 08.07.15.
@@ -251,12 +253,15 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {
-        if (SessionManager.getCurrentSession() != null && !qbrtcSession.equals(SessionManager.getCurrentSession())){
-            qbrtcSession.rejectCall(qbrtcSession.getUserInfo());
-        } else {
+        if (SessionManager.getCurrentSession() == null){
             SessionManager.setCurrentSession(qbrtcSession);
-            CallActivity.start(this, qbrtcSession.getConferenceType(), qbrtcSession.getOpponents(),
-                    qbrtcSession.getUserInfo(), Consts.CALL_DIRECTION_TYPE.INCOMING);
+            CallActivity.start(this,
+                    qbrtcSession.getConferenceType(),
+                    qbrtcSession.getOpponents(),
+                    qbrtcSession.getUserInfo(),
+                    Consts.CALL_DIRECTION_TYPE.INCOMING);
+        } else if (SessionManager.getCurrentSession() != null && !qbrtcSession.equals(SessionManager.getCurrentSession())){
+            qbrtcSession.rejectCall(new HashMap<String, String>());
         }
     }
 
@@ -277,7 +282,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
-        SessionManager.setCurrentSession(null);
+//        SessionManager.setCurrentSession(null);
     }
 
     @Override

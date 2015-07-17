@@ -2,6 +2,7 @@ package com.quickblox.sample.videochatwebrtcnew.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
 import com.quickblox.sample.videochatwebrtcnew.activities.BaseLogginedUserActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
+import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
@@ -83,8 +85,11 @@ public class IncomeCallFragment extends Fragment implements Serializable {
     private void initCallData(){
         QBRTCSession currentSession = SessionManager.getCurrentSession();
         if ( currentSession != null){
+            Log.d(TAG, "currentSession != null - " + String.valueOf(currentSession == null));
             opponents = currentSession.getOpponents();
+            Log.d(TAG, "opponents.size() - " + opponents.size());
             conferenceType = currentSession.getConferenceType();
+            Log.d(TAG, "currentSession != null - " + conferenceType);
         }
     }
 
@@ -111,6 +116,7 @@ public class IncomeCallFragment extends Fragment implements Serializable {
                 @Override
                 public void onClick(View v) {
                     rejectBtn.setClickable(false);
+                    takeBtn.setClickable(false);
                     Log.d(TAG, "Call is rejected");
                     stopCallNotification();
                     ((CallActivity) getActivity()).rejectCurrentSession();
@@ -122,9 +128,11 @@ public class IncomeCallFragment extends Fragment implements Serializable {
                 @Override
                 public void onClick(View v) {
                     takeBtn.setClickable(false);
+                    rejectBtn.setClickable(false);
                     stopCallNotification();
                     ((CallActivity) getActivity())
-                            .addConversationFragmentReceiveCall();
+                            .addConversationFragment(
+                                    opponents, conferenceType, Consts.CALL_DIRECTION_TYPE.INCOMING);
 
                     Log.d(TAG, "Call is started");
                 }
@@ -167,14 +175,15 @@ public class IncomeCallFragment extends Fragment implements Serializable {
     }
 
     private String getOtherIncUsersNames(List<Integer> opponents) {
+        List<Integer> otherOpponents = new ArrayList<>(opponents);
         StringBuffer s = new StringBuffer("");
         opponentsFromCall.addAll(DataHolder.getUsersList());
-        opponents.remove(QBChatService.getInstance().getUser().getId());
+        otherOpponents.remove(QBChatService.getInstance().getUser().getId());
 
-        for (Integer i : opponents) {
+        for (Integer i : otherOpponents) {
             for (QBUser usr : opponentsFromCall) {
                 if (usr.getId().equals(i)) {
-                    if (opponents.indexOf(i) == (opponents.size() - 1)) {
+                    if (otherOpponents.indexOf(i) == (otherOpponents.size() - 1)) {
                         s.append(usr.getFullName() + " ");
                         break;
                     } else {

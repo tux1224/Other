@@ -52,7 +52,7 @@ public class VideoConversationFragment extends BaseConversationFragment implemen
         // If user changed camera state few times and last state was CameraState.ENABLED_FROM_USER
         // than we turn on cam, else we nothing change
         if (cameraState != CameraState.DISABLED_FROM_USER
-                && qbConferenceType == QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.getValue()) {
+                && qbConferenceType == QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO) {
             toggleCamera(true);
         }
     }
@@ -93,7 +93,7 @@ public class VideoConversationFragment extends BaseConversationFragment implemen
     }
 
     @Override
-    protected void actionButtonsEnabled(boolean enability) {
+    public void actionButtonsEnabled(boolean enability) {
         super.actionButtonsEnabled(enability);
 
         cameraToggle.setEnabled(enability);
