@@ -255,7 +255,8 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
     private void showQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
-        quitDialog.setTitle(R.string.dialog_title);
+        quitDialog.setTitle(R.string.quit_dialog_title);
+        quitDialog.setMessage(R.string.quit_dialog_message);
 
         quitDialog.setPositiveButton(R.string.positive_response, new DialogInterface.OnClickListener() {
             @Override
@@ -265,13 +266,15 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
                 clearUserDataFromPreferences();
                 startListUsersActivity();
                 finish();
+                minimizeApp();
             }
         });
 
         quitDialog.setNegativeButton(R.string.negative_response, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finish();
+//                finish();
+                minimizeApp();
             }
         });
 
@@ -286,7 +289,8 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
     private void showLogOutDialog(){
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
-        quitDialog.setTitle(R.string.want_to_log_out);
+        quitDialog.setTitle(R.string.log_out_dialog_title);
+        quitDialog.setMessage(R.string.log_out_dialog_message);
 
         quitDialog.setPositiveButton(R.string.positive_button, new DialogInterface.OnClickListener() {
             @Override
@@ -314,5 +318,12 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         ed.remove(Consts.USER_LOGIN);
         ed.remove(Consts.USER_PASSWORD);
         ed.commit();
+    }
+
+    private void minimizeApp(){
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }

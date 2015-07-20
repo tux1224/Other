@@ -274,7 +274,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
     @Override
     public void onDestroy() {
-        ((CallActivity)getActivity()).hangUpCurrentSession();
+//        ((CallActivity)getActivity()).hangUpCurrentSession();
         super.onDestroy();
     }
 

@@ -4,11 +4,17 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +29,7 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.SessionManager;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
+import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.OpponentsActivity;
 import com.quickblox.sample.videochatwebrtcnew.definitions.Consts;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
@@ -49,6 +56,8 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private String password;
     private PendingIntent pendingIntent;
     private boolean isServiceAutostart;
+//    private NetworkChangeReceiver networkChangeReceiver;
+
 
     @Override
     public void onCreate() {
@@ -71,21 +80,28 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             pendingIntent = intent.getParcelableExtra(Consts.PARAM_PINTENT);
         }
 
-
         if(!QBChatService.getInstance().isLoggedIn()){
             QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
             createSession(login, password);
         }
-
-//        startForeground(1, createNotification());
 
         return super.onStartCommand(intent, flags, startId);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private Notification createNotification() {
-        Notification.Builder notificationBuilder = new Notification.Builder(IncomeCallListenerService.this);
+        Context context = getApplicationContext();
+        Intent notificationIntent = new Intent(context, ListUsersActivity.class);
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Notification.Builder notificationBuilder = new Notification.Builder(context);
         notificationBuilder.setSmallIcon(R.drawable.logo_qb)
+                .setContentIntent(contentIntent)
                 .setTicker(getResources().getString(R.string.service_launched))
                 .setWhen(System.currentTimeMillis())
                 .setContentTitle(getResources().getString(R.string.app_name))
@@ -129,70 +145,89 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         password = intent.getStringExtra(Consts.USER_PASSWORD);
         isServiceAutostart = intent.getBooleanExtra(Consts.IS_SERVICE_AUTOSTARTED, false);
         Log.d(TAG, "login = " + login + " password = " + password);
+
+        if (TextUtils.isEmpty(login) && TextUtils.isEmpty(password)){
+            SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+            login = sharedPreferences.getString(Consts.USER_LOGIN, null);
+            password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
+            Log.d(TAG, "login = " + login + " password = " + password + " from SharedPreferences");
+        }
     }
 
     private void createSession(final String login, final String password) {
-
         Log.d(TAG, "createSession()");
-        final QBUser user = new QBUser(login, password);
-        QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
-            @Override
-            public void onSuccess(QBSession session, Bundle bundle) {
-                Log.d(TAG, "onSuccess create session with params");
-                user.setId(session.getUserId());
+        if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
+            final QBUser user = new QBUser(login, password);
+            QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
+                @Override
+                public void onSuccess(QBSession session, Bundle bundle) {
+                    Log.d(TAG, "onSuccess create session with params");
+                    user.setId(session.getUserId());
 
-                if (chatService.isLoggedIn()) {
-                    Log.d(TAG, "chatService.isLoggedIn()");
-                    startActionsOnSuccessLogin(login, password);
-                } else {
-                    Log.d(TAG, "!chatService.isLoggedIn()");
-                    chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
+                    if (chatService.isLoggedIn()) {
+                        Log.d(TAG, "chatService.isLoggedIn()");
+                        startActionsOnSuccessLogin(login, password);
+                    } else {
+                        Log.d(TAG, "!chatService.isLoggedIn()");
+                        chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
 
-                        @Override
-                        public void onSuccess(QBUser result, Bundle params) {
-                            Log.d(TAG, "onSuccess login to chat with params");
-                            startActionsOnSuccessLogin(login, password);
-                        }
-
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess login to chat");
-                            startActionsOnSuccessLogin(login, password);
-                        }
-
-                        @Override
-                        public void onError(List errors) {
-                            sendResultToActivity(false);
-                            Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
-                            for (Object error : errors) {
-                                Log.d(TAG, error.toString());
+                            @Override
+                            public void onSuccess(QBUser result, Bundle params) {
+                                Log.d(TAG, "onSuccess login to chat with params");
+                                startActionsOnSuccessLogin(login, password);
                             }
-                        }
-                    });
+
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "onSuccess login to chat");
+                                startActionsOnSuccessLogin(login, password);
+                            }
+
+                            @Override
+                            public void onError(List errors) {
+                                sendResultToActivity(false);
+                                Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
+                                for (Object error : errors) {
+                                    Log.d(TAG, error.toString());
+                                }
+                            }
+                        });
+                    }
                 }
-            }
 
-            @Override
-            public void onSuccess() {
-                super.onSuccess();
-                Log.d(TAG, "onSuccess create session");
-            }
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    Log.d(TAG, "onSuccess create session");
+                }
 
-            @Override
-            public void onError(List<String> errors) {
-                sendResultToActivity(false);
-                Toast.makeText(IncomeCallListenerService.this, "Error when login, check test users login and password", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onError(List<String> errors) {
+                    sendResultToActivity(false);
+                    Toast.makeText(IncomeCallListenerService.this, "Error when login, check test users login and password", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            sendResultToActivity(false);
+            Toast.makeText(IncomeCallListenerService.this, "Error when login, check test users login and password", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void startActionsOnSuccessLogin(String login, String password) {
         initQBRTCClient();
+        sendResultToActivity(true);
         startOpponentsActivity();
         startForeground(1, createNotification());
-        sendResultToActivity(true);
         saveUserDataToPreferences(login, password);
+//        registerNetworkChangeReceiver();
     }
+
+//    private void registerNetworkChangeReceiver() {
+//        networkChangeReceiver = new NetworkChangeReceiver();
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+//        registerReceiver(networkChangeReceiver, intentFilter);
+//    }
 
     private void saveUserDataToPreferences(String login, String password){
         SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
@@ -217,11 +252,13 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void sendResultToActivity (boolean isSuccess){
-        try {
-            Intent intent = new Intent().putExtra(Consts.LOGIN_RESULT, isSuccess);
-            pendingIntent.send(IncomeCallListenerService.this, Consts.LOGIN_RESULT_CODE, intent);
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
+        if (!isServiceAutostart) {
+            try {
+                Intent intent = new Intent().putExtra(Consts.LOGIN_RESULT, isSuccess);
+                pendingIntent.send(IncomeCallListenerService.this, Consts.LOGIN_RESULT_CODE, intent);
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -230,6 +267,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
         QBChatService.getInstance().destroy();
         SessionManager.setCurrentSession(null);
+//        unregisterReceiver(networkChangeReceiver);
 //        resetAutoStartFlag();
         super.onDestroy();
     }
@@ -285,4 +323,61 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     public void onSessionStartClose(QBRTCSession qbrtcSession) {
 
     }
+
+//    public class NetworkChangeReceiver extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(final Context context, final Intent intent) {
+//
+//            final ConnectivityManager connMgr = (ConnectivityManager) context
+//                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//            final android.net.NetworkInfo wifi = connMgr
+//                    .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+//
+//            final android.net.NetworkInfo mobile = connMgr
+//                    .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+//
+//            if (wifi.isAvailable() || mobile.isAvailable()) {
+//                reloginToChat(login, password);
+//                Toast.makeText(context, "Login to chat by connected to internet", Toast.LENGTH_LONG).show();
+//            } else {
+//                try {
+//                    QBChatService.getInstance().logout();
+//                    Toast.makeText(context, "Log out from chat by disconnected from internet", Toast.LENGTH_LONG).show();
+//                } catch (SmackException.NotConnectedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
+//
+//    private void reloginToChat(String login, String password) {
+//        if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
+//            final QBUser user = new QBUser(login, password);
+//            if (chatService != null && !chatService.isLoggedIn()) {
+//                chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
+//
+//                    @Override
+//                    public void onSuccess(QBUser result, Bundle params) {
+//                        Log.d(TAG, "onSuccess login to chat with params");
+//                    }
+//
+//                    @Override
+//                    public void onSuccess() {
+//                        Log.d(TAG, "onSuccess login to chat");
+//                    }
+//
+//                    @Override
+//                    public void onError(List errors) {
+//                        Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
+//                        for (Object error : errors) {
+//                            Log.d(TAG, error.toString());
+//                        }
+//                    }
+//                });
+//
+//            }
+//        }
+//    }
 }

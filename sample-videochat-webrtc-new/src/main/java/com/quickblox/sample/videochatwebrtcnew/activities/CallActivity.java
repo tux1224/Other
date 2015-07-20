@@ -95,7 +95,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initQBRTCConnectionListener();
+//        initQBRTCConnectionListener();
         initWiFiManagerListener();
 
         if (getIntent().getExtras() != null) {
@@ -262,6 +262,8 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     @Override
     protected void onStart() {
         super.onStart();
+
+        initQBRTCConnectionListener();
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);

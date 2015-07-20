@@ -15,6 +15,10 @@ public class Consts {
     public static final String INCOME_CALL_FRAGMENT = "income_call_fragment";
     public static final String CONVERSATION_CALL_FRAGMENT = "conversation_call_fragment";
 
+    public static final int CONNECTION_TYPE_WIFI = 1;
+    public static final int CONNECTION_TYPE_MOBILE = 2;
+    public static final int CONNECTION_TYPE_NOT_CONNECTED = 0;
+
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;
     public final static int LOGIN_RESULT_CODE = 1003;

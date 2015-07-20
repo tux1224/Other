@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Video &amp; Audio Chat Sample</string>
+    <string name="app_name"> Video &amp; Audio Chat Sample</string>
     <string name="action_log_out">Log out</string>
     <string name="login_as">Login as</string>
     <string name="logged_in_as">Logged In as</string>
@@ -47,10 +47,12 @@
     <string name="WIFI_DISABLED">Call was stoped because connection was lost</string>
     <string name="NETWORK_ABSENT">Connection lost</string>
     
-    <string name="dialog_title">Quit the application?</string>
-    <string name="positive_response">Log out</string>
+    <string name="quit_dialog_title">Exit</string>
+    <string name="quit_dialog_message">Press \"Minimize\" to minimize the application or the \"Exit with log out\" to log out and exit from the app</string>
+    <string name="positive_response">Exit with log out</string>
     <string name="negative_response">Minimize</string>
-    <string name="want_to_log_out">You want to log out from the application</string>
+    <string name="log_out_dialog_title">Log out?</string>
+    <string name="log_out_dialog_message">You lose the ability to receive calls</string>
     <string name="positive_button">Ok</string>
     <string name="negative_button">Cancel</string>
 

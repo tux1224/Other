@@ -55,18 +55,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         usersList = (ListView) findViewById(R.id.usersListView);
     }
 
-    public static int getUserIndex(int id) {
-        int index = 0;
-
-        for (User usr : users) {
-            if (usr.getId().equals(id)) {
-                index = (users.indexOf(usr)) + 1;
-                break;
-            }
-        }
-        return index;
-    }
-
     private void initUsersList() {
         usersListAdapter = new UsersAdapter(this, users);
         usersList.setAdapter(usersListAdapter);
