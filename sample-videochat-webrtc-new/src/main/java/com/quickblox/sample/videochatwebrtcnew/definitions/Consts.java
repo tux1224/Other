@@ -19,6 +19,8 @@ public class Consts {
     public static final int CONNECTION_TYPE_MOBILE = 2;
     public static final int CONNECTION_TYPE_NOT_CONNECTED = 0;
 
+    public static final int NOTIFICATION_ID = 1004;
+
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;
     public final static int LOGIN_RESULT_CODE = 1003;

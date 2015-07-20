@@ -228,6 +228,11 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private ArrayList<QBUser> reorderUsersByName(ArrayList<QBUser> qbUsers) {
         // Make clone collection to avoid modify input param qbUsers
         ArrayList<QBUser> resultList = new ArrayList<>(qbUsers.size());
@@ -281,12 +286,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         quitDialog.show();
     }
 
-    private void startListUsersActivity(){
-        Intent intent = new Intent(this, ListUsersActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        startActivity(intent);
-    }
-
     private void showLogOutDialog(){
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
         quitDialog.setTitle(R.string.log_out_dialog_title);
@@ -312,18 +311,5 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         quitDialog.show();
 
     }
-    private void clearUserDataFromPreferences(){
-        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor ed = sharedPreferences.edit();
-        ed.remove(Consts.USER_LOGIN);
-        ed.remove(Consts.USER_PASSWORD);
-        ed.commit();
-    }
 
-    private void minimizeApp(){
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startMain);
-    }
 }

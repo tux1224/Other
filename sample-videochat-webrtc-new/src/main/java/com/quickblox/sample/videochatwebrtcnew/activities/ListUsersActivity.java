@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -68,7 +67,7 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
                 initProgressDialog();
-                startIncomeCallListenerService(login, password);
+                startIncomeCallListenerService(login, password, false);
             }
         });
     }

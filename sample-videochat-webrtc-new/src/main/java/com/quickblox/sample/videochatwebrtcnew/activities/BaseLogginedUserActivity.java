@@ -1,16 +1,28 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quickblox.chat.QBChatService;
 import com.quickblox.sample.videochatwebrtcnew.R;
@@ -31,10 +43,14 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
     private Chronometer timerABWithTimer;
     private boolean isTimerStarted = false;
     protected QBUser loginedUser;
+    private NetworkChangeReceiver networkChangeReceiver;
+    private String login;
+    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        registerNetworkChangeReceiver();
 
         if (QBChatService.isInitialized()) {
             if (QBChatService.getInstance().isLoggedIn()) {
@@ -126,13 +142,13 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
         }
     }
 
-    public void startIncomeCallListenerService(String login, String password){
+    public void startIncomeCallListenerService(String login, String password, boolean isAutoStarted){
         Intent tempIntent = new Intent(this, IncomeCallListenerService.class);
         PendingIntent pendingIntent = createPendingResult(Consts.LOGIN_TASK_CODE, tempIntent, 0);
         Intent intent = new Intent(this, IncomeCallListenerService.class);
         intent.putExtra(Consts.USER_LOGIN, login);
         intent.putExtra(Consts.USER_PASSWORD, password);
-        intent.putExtra(Consts.IS_SERVICE_AUTOSTARTED, false);
+        intent.putExtra(Consts.IS_SERVICE_AUTOSTARTED, isAutoStarted);
         intent.putExtra(Consts.PARAM_PINTENT, pendingIntent);
         startService(intent);
     }
@@ -218,7 +234,111 @@ public class BaseLogginedUserActivity extends AppCompatActivity {
         }
         return resStr;
     }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void sendNotificationConnectionLost() {
+        Context context = getApplicationContext();
+        Intent notificationIntent = new Intent(context, ListUsersActivity.class);
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Notification.Builder notificationBuilder = new Notification.Builder(context);
+        notificationBuilder.setSmallIcon(R.drawable.logo_qb)
+                .setContentIntent(contentIntent)
+                .setTicker(getResources().getString(R.string.service_stopped))
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText(getResources().getString(R.string.service_stopped));
+
+        Notification notification = notificationBuilder.build();
+        NotificationManager notificationManager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(Consts.NOTIFICATION_ID, notification);
+    }
+
+    protected void startListUsersActivity(){
+        Intent intent = new Intent(this, ListUsersActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+    }
+
+    protected void getUserDataFromPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        login = sharedPreferences.getString(Consts.USER_LOGIN, null);
+        password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
+    }
+
+    protected void saveUserDataToPreferences(String login, String password){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor ed = sharedPreferences.edit();
+        ed.putString(Consts.USER_LOGIN, login);
+        ed.putString(Consts.USER_PASSWORD, password);
+        ed.commit();
+    }
+
+    protected void clearUserDataFromPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor ed = sharedPreferences.edit();
+        ed.remove(Consts.USER_LOGIN);
+        ed.remove(Consts.USER_PASSWORD);
+        ed.commit();
+    }
+
+    protected void minimizeApp(){
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
+    private void registerNetworkChangeReceiver() {
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(networkChangeReceiver);
+        super.onDestroy();
+    }
+
+
+    public class NetworkChangeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+
+            final ConnectivityManager connMgr = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            final android.net.NetworkInfo wifi = connMgr
+                    .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+            final android.net.NetworkInfo mobile = connMgr
+                    .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if (wifi.isAvailable() || mobile.isAvailable()) {
+                getUserDataFromPreferences();
+                if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)){
+                    startIncomeCallListenerService(login, password, true);
+                }
+                Toast.makeText(context, "Login to chat by connected to internet", Toast.LENGTH_LONG).show();
+            } else {
+                stopIncomeCallListenerService();
+//                sendNotificationConnectionLost();
+                startListUsersActivity();
+//                finish();
+                Toast.makeText(context, "Log out from chat by disconnected from internet", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 }
+
 
 
 

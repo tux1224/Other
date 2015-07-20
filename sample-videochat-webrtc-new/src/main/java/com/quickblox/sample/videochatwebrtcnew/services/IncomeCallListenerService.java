@@ -56,7 +56,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private String password;
     private PendingIntent pendingIntent;
     private boolean isServiceAutostart;
-//    private NetworkChangeReceiver networkChangeReceiver;
 
 
     @Override
@@ -217,17 +216,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         initQBRTCClient();
         sendResultToActivity(true);
         startOpponentsActivity();
-        startForeground(1, createNotification());
+        startForeground(Consts.NOTIFICATION_ID, createNotification());
         saveUserDataToPreferences(login, password);
 //        registerNetworkChangeReceiver();
     }
-
-//    private void registerNetworkChangeReceiver() {
-//        networkChangeReceiver = new NetworkChangeReceiver();
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-//        registerReceiver(networkChangeReceiver, intentFilter);
-//    }
 
     private void saveUserDataToPreferences(String login, String password){
         SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
@@ -323,61 +315,4 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     public void onSessionStartClose(QBRTCSession qbrtcSession) {
 
     }
-
-//    public class NetworkChangeReceiver extends BroadcastReceiver {
-//
-//        @Override
-//        public void onReceive(final Context context, final Intent intent) {
-//
-//            final ConnectivityManager connMgr = (ConnectivityManager) context
-//                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-//
-//            final android.net.NetworkInfo wifi = connMgr
-//                    .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-//
-//            final android.net.NetworkInfo mobile = connMgr
-//                    .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-//
-//            if (wifi.isAvailable() || mobile.isAvailable()) {
-//                reloginToChat(login, password);
-//                Toast.makeText(context, "Login to chat by connected to internet", Toast.LENGTH_LONG).show();
-//            } else {
-//                try {
-//                    QBChatService.getInstance().logout();
-//                    Toast.makeText(context, "Log out from chat by disconnected from internet", Toast.LENGTH_LONG).show();
-//                } catch (SmackException.NotConnectedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
-//
-//    private void reloginToChat(String login, String password) {
-//        if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
-//            final QBUser user = new QBUser(login, password);
-//            if (chatService != null && !chatService.isLoggedIn()) {
-//                chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
-//
-//                    @Override
-//                    public void onSuccess(QBUser result, Bundle params) {
-//                        Log.d(TAG, "onSuccess login to chat with params");
-//                    }
-//
-//                    @Override
-//                    public void onSuccess() {
-//                        Log.d(TAG, "onSuccess login to chat");
-//                    }
-//
-//                    @Override
-//                    public void onError(List errors) {
-//                        Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
-//                        for (Object error : errors) {
-//                            Log.d(TAG, error.toString());
-//                        }
-//                    }
-//                });
-//
-//            }
-//        }
-//    }
 }
