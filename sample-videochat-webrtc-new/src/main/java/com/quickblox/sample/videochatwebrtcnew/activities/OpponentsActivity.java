@@ -94,7 +94,14 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
                 @Override
                 public void onError(List<String> strings) {
-                    Log.d(TAG, "onError()");
+                    for (String s : strings) {
+                        Log.d(TAG, s);
+                    }
+                    OpponentsAdapter.i = 0;
+                    stopIncomeCallListenerService();
+                    clearUserDataFromPreferences();
+                    startListUsersActivity();
+                    finish();
                 }
             });
         } else {
@@ -164,9 +171,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
             CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
                     userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
 
-//            CallActivity.getInstance().addConversationFragmentStartCall(getOpponentsIds(opponentsAdapter.getSelected()),
-//                    qbConferenceType, userInfo);
-
         } else if (opponentsAdapter.getSelected().size() > 1){
             Toast.makeText(this, getString(R.string.only_peer_to_peer_calls), Toast.LENGTH_LONG).show();
         } else if (opponentsAdapter.getSelected().size() < 1){
@@ -193,7 +197,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
         if (OpponentsAdapter.i > 0){
             opponentsListView.setSelection(OpponentsAdapter.i);
-
         }
     }
 
@@ -255,7 +258,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     }
     @Override
     public void onBackPressed() {
-        showQuitDialog();
+        minimizeApp();
     }
 
     private void showQuitDialog() {
@@ -278,7 +281,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         quitDialog.setNegativeButton(R.string.negative_response, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//                finish();
                 minimizeApp();
             }
         });
@@ -309,7 +311,5 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         });
 
         quitDialog.show();
-
     }
-
 }

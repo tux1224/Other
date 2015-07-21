@@ -52,9 +52,9 @@
     <string name="quit_dialog_message">Press \"Minimize\" to minimize the application or the \"Exit with log out\" to log out and exit from the app</string>
     <string name="positive_response">Exit with log out</string>
     <string name="negative_response">Minimize</string>
-    <string name="log_out_dialog_title">Log out?</string>
-    <string name="log_out_dialog_message">You lose the ability to receive calls</string>
-    <string name="positive_button">Ok</string>
+    <string name="log_out_dialog_title">Log out</string>
+    <string name="log_out_dialog_message">Are you sure?</string>
+    <string name="positive_button">Log out</string>
     <string name="negative_button">Cancel</string>
 
     //Colors

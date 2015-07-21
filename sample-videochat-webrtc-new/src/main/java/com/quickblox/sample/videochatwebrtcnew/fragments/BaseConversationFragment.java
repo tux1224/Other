@@ -127,14 +127,13 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
         super.onStart();
         QBRTCSession session = SessionManager.getCurrentSession();
-        if (!isMessageProcessed) {
+        if (!isMessageProcessed && session != null) {
             if (startReason == Consts.CALL_DIRECTION_TYPE.INCOMING.ordinal()) {
                 Log.d(TAG, "acceptCall() from " + TAG);
                 session.acceptCall(session.getUserInfo());
             } else {
                 Log.d(TAG, "startCall() from " + TAG);
                 session.startCall(session.getUserInfo());
-//                startOutBeep();
             }
             isMessageProcessed = true;
         }
@@ -274,7 +273,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
     @Override
     public void onDestroy() {
-//        ((CallActivity)getActivity()).hangUpCurrentSession();
         super.onDestroy();
     }
 

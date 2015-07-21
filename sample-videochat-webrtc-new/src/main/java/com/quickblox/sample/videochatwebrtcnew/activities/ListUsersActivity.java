@@ -32,7 +32,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     private static ArrayList<User> users = DataHolder.getUsersList();
     private ProgressDialog progressDialog;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,15 +58,12 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         usersList.setAdapter(usersListAdapter);
         usersList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-
-
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 String login = usersListAdapter.getItem(position).getLogin();
                 String password = usersListAdapter.getItem(position).getPassword();
                 initProgressDialog();
-                startIncomeCallListenerService(login, password, false);
+                startIncomeCallListenerService(login, password, Consts.LOGIN);
             }
         });
     }
@@ -115,8 +111,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
             hideProgressDialog(isLoginSuccess);
         }
     }
-
-
 
     @Override
     protected void onStop() {

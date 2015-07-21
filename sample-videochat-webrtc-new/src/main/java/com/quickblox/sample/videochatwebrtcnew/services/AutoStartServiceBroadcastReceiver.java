@@ -22,19 +22,15 @@ public class AutoStartServiceBroadcastReceiver extends BroadcastReceiver {
         String password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
 
         if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(Consts.IS_SERVICE_AUTOSTARTED, true);
-            editor.commit();
-
             Intent serviceIntent = new Intent(context, IncomeCallListenerService.class);
             serviceIntent.putExtra(Consts.USER_LOGIN, login);
             serviceIntent.putExtra(Consts.USER_PASSWORD, password);
-            serviceIntent.putExtra(Consts.IS_SERVICE_AUTOSTARTED, true);
+            serviceIntent.putExtra(Consts.START_SERVICE_VARIANT, Consts.AUTOSTART);
             context.startService(serviceIntent);
         }
 
         Log.d(TAG, "onReceive " + intent.getAction());
-        Log.d(TAG, "login = " + login+ " password = " + password + " isAutoStarted = " + sharedPreferences.getBoolean(Consts.IS_SERVICE_AUTOSTARTED, false));
+        Log.d(TAG, "login = " + login+ " password = " + password);
     }
 }
 

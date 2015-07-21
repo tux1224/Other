@@ -19,7 +19,8 @@ public class Consts {
     public static final int CONNECTION_TYPE_MOBILE = 2;
     public static final int CONNECTION_TYPE_NOT_CONNECTED = 0;
 
-    public static final int NOTIFICATION_ID = 1004;
+    public static final int NOTIFICATION_FORAGROUND = 1004;
+    public static final int NOTIFICATION_CONNECTION_LOST = 1005;
 
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;
@@ -27,6 +28,14 @@ public class Consts {
     public final static int RESULT_CODE_1 = 1;
     public final static int RESULT_CODE_2 = 2;
     public final static int RESULT_CODE_3 = 3;
+
+    //Start srvice variant
+    public final static String START_SERVICE_VARIANT = "start_service_variant";
+    public final static int AUTOSTART = 1004;
+    public final static int RELOGIN = 1005;
+    public final static int LOGIN = 1006;
+
+
 
     public final static String PARAM_PINTENT = "pendingIntent";
     public final static String LOGIN_RESULT = "result";
