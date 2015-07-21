@@ -72,8 +72,11 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         }
 
         if (intent != null && intent.getExtras()!= null) {
-            parseIntentExtras(intent);
             pendingIntent = intent.getParcelableExtra(Consts.PARAM_PINTENT);
+            parseIntentExtras(intent);
+            if (TextUtils.isEmpty(login) && TextUtils.isEmpty(password)){
+                getUserDataFromPreferences();
+            }
         }
 
         if(!QBChatService.getInstance().isLoggedIn()){
@@ -153,13 +156,12 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         password = intent.getStringExtra(Consts.USER_PASSWORD);
         startServiceVariant = intent.getIntExtra(Consts.START_SERVICE_VARIANT, Consts.AUTOSTART);
         Log.d(TAG, "login = " + login + " password = " + password);
+    }
 
-        if (TextUtils.isEmpty(login) && TextUtils.isEmpty(password)){
-            SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
-            login = sharedPreferences.getString(Consts.USER_LOGIN, null);
-            password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
-            Log.d(TAG, "login = " + login + " password = " + password + " from SharedPreferences");
-        }
+    protected void getUserDataFromPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        login = sharedPreferences.getString(Consts.USER_LOGIN, null);
+        password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
     }
 
     private void createSession(final String login, final String password) {
