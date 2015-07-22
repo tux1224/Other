@@ -100,7 +100,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         if (getIntent().getExtras() != null) {
             parseIntentExtras(getIntent().getExtras());
         }
-        Log.d(TAG, "onCreate()" + call_direction_type);
+//        Log.d(TAG, "onCreate()" + call_direction_type);
         if (call_direction_type == Consts.CALL_DIRECTION_TYPE.INCOMING){
             isInCommingCall = true;
             Log.d(TAG, "onCreate()" + call_direction_type);
@@ -190,24 +190,6 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         }
     }
 
-    private BaseConversationFragment createConnversationFragment(QBRTCTypes.QBConferenceType call_type){
-        BaseConversationFragment fragment = (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(
-                call_type)) ? new VideoConversationFragment() : new AudioConversationFragment();
-        return fragment;
-    }
-
-    public Fragment getCurrentFragmentByTag(String tag){
-
-        if (tag.equals(Consts.INCOME_CALL_FRAGMENT)){
-            return getFragmentManager().findFragmentByTag(tag);
-        } else if (tag.equals(Consts.CONVERSATION_CALL_FRAGMENT)){
-            return getFragmentManager().findFragmentByTag(tag);
-        } else {
-            return null;
-        }
-    }
-
-
     private void initIncommingCallTask() {
         showIncomingCallWindowTaskHandler = new Handler(Looper.myLooper());
         showIncomingCallWindowTask = new Runnable() {
@@ -223,6 +205,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     }
                 } else {
                     rejectCurrentSession();
+                    finish();
                 }
                 Toast.makeText(CallActivity.this, "Call was stopped by timer", Toast.LENGTH_LONG).show();
             }
@@ -240,7 +223,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         if (SessionManager.getCurrentSession() != null) {
             SessionManager.getCurrentSession().hangUp(new HashMap<String, String>());
         }
-//        finish();
+        finish();
     }
 
     private void startIncomeCallTimer() {
@@ -407,7 +390,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     // Remove current session
                     Log.d(TAG, "Remove current session");
                     Log.d("Crash", "onSessionClosed. Set session to null");
-                    SessionManager.setCurrentSession(null);
+//                    SessionManager.setCurrentSession(null);
 
                     stopTimer();
                     closeByWifiStateAllow = true;
@@ -440,12 +423,12 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     }
 
     private void showToast(final int message) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_LONG).show();
-//            }
-//        });
+            }
+        });
     }
 
 //    private void setStateTitle(final Integer userID, final int stringID, final int progressBarVisibility) {
@@ -546,14 +529,14 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     protected void onDestroy() {
         super.onDestroy();
         removeActivityAsCallbackToRTCClient();
-        if (SessionManager.getCurrentSession() != null){
-            if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_ACTIVE) {
-                hangUpCurrentSession();
-            } else {
-                rejectCurrentSession();
-            }
-            SessionManager.setCurrentSession(null);
-        }
+//        if (SessionManager.getCurrentSession() != null){
+//            if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_ACTIVE) {
+//                hangUpCurrentSession();
+//            } else {
+//                rejectCurrentSession();
+//            }
+////            SessionManager.setCurrentSession(null);
+//        }
     }
 
     private void removeActivityAsCallbackToRTCClient() {
@@ -566,6 +549,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     public void onAttachedToWindow() {
         this.getWindow().setFlags(
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
