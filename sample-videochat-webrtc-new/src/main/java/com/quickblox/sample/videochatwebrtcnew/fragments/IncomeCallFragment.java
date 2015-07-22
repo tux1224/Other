@@ -29,6 +29,7 @@ import com.quickblox.videochat.webrtc.QBRTCTypes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tereha on 16.02.15.
@@ -49,6 +50,7 @@ public class IncomeCallFragment extends Fragment implements Serializable {
     private QBRTCTypes.QBConferenceType conferenceType;
     private View view;
     private boolean isVideoCall;
+    private Map<String, String> userInfo;
 
 
     @Override
@@ -90,6 +92,7 @@ public class IncomeCallFragment extends Fragment implements Serializable {
             Log.d(TAG, "opponents.size() - " + opponents.size());
             conferenceType = currentSession.getConferenceType();
             Log.d(TAG, "currentSession != null - " + conferenceType);
+            userInfo = currentSession.getUserInfo();
         }
     }
 

@@ -7,13 +7,13 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
  */
 public class SessionManager {
 
-    private static QBRTCSession currentSession;
+    private static volatile QBRTCSession currentSession;
 
-    public static QBRTCSession getCurrentSession() {
+    public synchronized static QBRTCSession getCurrentSession() {
         return currentSession;
     }
 
-    public static void setCurrentSession(QBRTCSession qbCurrentSession) {
+    public synchronized static void setCurrentSession(QBRTCSession qbCurrentSession) {
         currentSession = qbCurrentSession;
     }
 }

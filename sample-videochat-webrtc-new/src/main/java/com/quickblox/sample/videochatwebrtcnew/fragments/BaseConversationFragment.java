@@ -89,7 +89,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
         }
         initViews(view);
-//        createOpponentsList(opponents);
         return view;
     }
 

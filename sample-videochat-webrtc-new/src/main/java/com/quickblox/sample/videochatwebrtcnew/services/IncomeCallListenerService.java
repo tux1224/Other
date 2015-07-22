@@ -19,6 +19,7 @@ import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
+import com.quickblox.chat.listeners.QBVideoChatSignalingListener;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
@@ -36,6 +37,7 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.packet.Message;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +54,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private String password;
     private PendingIntent pendingIntent;
     private int startServiceVariant;
-    private QBVideoChatSignalingManagerListener qbVideoChatSignalingManagerListener;
-
 
     @Override
     public void onCreate() {
@@ -111,6 +111,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void initQBRTCClient() {
+        Log.d(TAG, "initQBRTCClient()");
 
         try {
             QBChatService.getInstance().startAutoSendPresence(60);
@@ -119,27 +120,14 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         }
 
         // Add signalling manager
-//        QBChatService.getInstance().getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
-//            @Override
-//            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-//                if (!createdLocally) {
-//                    QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
-//                }
-//            }
-//        });
-
-        qbVideoChatSignalingManagerListener = new QBVideoChatSignalingManagerListener() {
+        QBChatService.getInstance().getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
             @Override
             public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
                 if (!createdLocally) {
                     QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
                 }
             }
-        };
-
-        QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
-                .addSignalingManagerListener(qbVideoChatSignalingManagerListener);
-
+        });
 
         QBRTCConfig.setAnswerTimeInterval(Consts.ANSWER_TIME_INTERVAL);
 
@@ -148,6 +136,8 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
         // Start mange QBRTCSessions according to VideoCall parser's callbacks
         QBRTCClient.getInstance().prepareToProcessCalls(this);
+
+        Log.d(TAG, "QBRTCClient.isInitiated() - " + QBRTCClient.isInitiated());
     }
 
     private void parseIntentExtras(Intent intent) {
@@ -244,8 +234,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         ed.commit();
 
         Log.d(TAG, "login = " + sharedPreferences.getString(Consts.USER_LOGIN, null)
-                + " password = " + sharedPreferences.getString(Consts.USER_PASSWORD, null)
-                + " isAutoStarted = " + sharedPreferences.getBoolean(Consts.IS_SERVICE_AUTOSTARTED, false));
+                + " password = " + sharedPreferences.getString(Consts.USER_PASSWORD, null));
     }
 
     private void startOpponentsActivity(){
@@ -269,9 +258,11 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onDestroy() {
-        QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
+        QBRTCClient.getInstance().close(true);
+        Log.d(TAG, "QBRTCClient.isInitiated() - " + QBRTCClient.isInitiated());
         QBChatService.getInstance().destroy();
         SessionManager.setCurrentSession(null);
+        Log.d(TAG, "QBChatService.isInitialized() - " + QBChatService.isInitialized());
         super.onDestroy();
     }
 
@@ -291,6 +282,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {
+        Log.d(TAG, "onReceiveNewSession");
         if (SessionManager.getCurrentSession() == null){
             SessionManager.setCurrentSession(qbrtcSession);
             CallActivity.start(this,
