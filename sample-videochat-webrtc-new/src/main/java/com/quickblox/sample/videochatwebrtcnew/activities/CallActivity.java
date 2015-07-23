@@ -370,10 +370,12 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                         Log.d(TAG, "isInCommingCall - " + isInCommingCall);
                     }
 
+                    SessionManager.setCurrentSession(null);
+
                     Log.d(TAG, "Stop session");
                     finish();
 
-                    SessionManager.setCurrentSession(session);
+
 
                     stopTimer();
                     closeByWifiStateAllow = true;
@@ -410,7 +412,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_SHORT).show();
             }
         });
     }

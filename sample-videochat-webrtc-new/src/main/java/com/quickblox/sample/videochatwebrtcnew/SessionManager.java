@@ -9,14 +9,14 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
  */
 public class SessionManager {
 
-    private static volatile QBRTCSession currentSession;
+    private static QBRTCSession currentSession;
     private static final String TAG = SessionManager.class.getSimpleName();
 
-    public synchronized static QBRTCSession getCurrentSession() {
+    public static QBRTCSession getCurrentSession() {
         return currentSession;
     }
 
-    public synchronized static void setCurrentSession(QBRTCSession qbCurrentSession) {
+    public static void setCurrentSession(QBRTCSession qbCurrentSession) {
         currentSession = qbCurrentSession;
     }
 }

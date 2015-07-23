@@ -280,10 +280,8 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                     qbrtcSession.getOpponents(),
                     qbrtcSession.getUserInfo(),
                     Consts.CALL_DIRECTION_TYPE.INCOMING);
-        } else {
-            if (!qbrtcSession.equals(SessionManager.getCurrentSession())){
+        } else if (SessionManager.getCurrentSession() != null && !qbrtcSession.equals(SessionManager.getCurrentSession())){
                 qbrtcSession.rejectCall(new HashMap<String, String>());
-            }
         }
     }
 
@@ -304,7 +302,9 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
-        SessionManager.setCurrentSession(null);
+        if (qbrtcSession.equals(SessionManager.getCurrentSession())) {
+            SessionManager.setCurrentSession(null);
+        }
     }
 
     @Override
