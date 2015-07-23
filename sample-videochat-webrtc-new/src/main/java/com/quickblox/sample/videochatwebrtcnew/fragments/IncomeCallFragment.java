@@ -87,11 +87,8 @@ public class IncomeCallFragment extends Fragment implements Serializable {
     private void initCallData(){
         QBRTCSession currentSession = SessionManager.getCurrentSession();
         if ( currentSession != null){
-            Log.d(TAG, "currentSession != null - " + String.valueOf(currentSession == null));
             opponents = currentSession.getOpponents();
-            Log.d(TAG, "opponents.size() - " + opponents.size());
             conferenceType = currentSession.getConferenceType();
-            Log.d(TAG, "currentSession != null - " + conferenceType);
             userInfo = currentSession.getUserInfo();
         }
     }
@@ -201,12 +198,10 @@ public class IncomeCallFragment extends Fragment implements Serializable {
     public void onStop() {
         stopCallNotification();
         super.onDestroy();
-        Log.d(TAG, "onDestroy() from IncomeCallFragment");
     }
 
     @Override
     public void onDestroy() {
-//        ((CallActivity)getActivity()).rejectCurrentSession();
         super.onDestroy();
     }
 }

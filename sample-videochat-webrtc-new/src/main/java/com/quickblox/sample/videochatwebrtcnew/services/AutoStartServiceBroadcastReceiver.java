@@ -28,9 +28,6 @@ public class AutoStartServiceBroadcastReceiver extends BroadcastReceiver {
             serviceIntent.putExtra(Consts.START_SERVICE_VARIANT, Consts.AUTOSTART);
             context.startService(serviceIntent);
         }
-
-        Log.d(TAG, "onReceive " + intent.getAction());
-        Log.d(TAG, "login = " + login+ " password = " + password);
     }
 }
 

@@ -36,16 +36,15 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!QBChatService.isInitialized()) {
-
+        if (QBChatService.isInitialized() && QBChatService.getInstance().isLoggedIn()) {
+            startOpponentsActivity();
+            finish();
+        } else {
             Fabric.with(this, new Crashlytics());
             setContentView(R.layout.activity_login);
 
             initUI();
             initUsersList();
-        } else {
-            startOpponentsActivity();
-            finish();
         }
     }
 

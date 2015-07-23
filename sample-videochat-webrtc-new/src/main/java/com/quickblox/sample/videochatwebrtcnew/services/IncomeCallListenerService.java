@@ -66,10 +66,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         Log.d(TAG, "Service started");
 
         if (!QBChatService.isInitialized()) {
-            Log.d(TAG, "!QBChatService.isInitialized()");
             QBChatService.init(this);
-            chatService = QBChatService.getInstance();
         }
+
+        chatService = QBChatService.getInstance();
 
         if (intent != null && intent.getExtras()!= null) {
             pendingIntent = intent.getParcelableExtra(Consts.PARAM_PINTENT);
@@ -111,8 +111,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void initQBRTCClient() {
-        Log.d(TAG, "initQBRTCClient()");
-
         try {
             QBChatService.getInstance().startAutoSendPresence(60);
         } catch (SmackException.NotLoggedInException e) {
@@ -136,16 +134,12 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
         // Start mange QBRTCSessions according to VideoCall parser's callbacks
         QBRTCClient.getInstance().prepareToProcessCalls(this);
-
-        Log.d(TAG, "QBRTCClient.isInitiated() - " + QBRTCClient.isInitiated());
     }
 
     private void parseIntentExtras(Intent intent) {
-        Log.d(TAG, "parseIntentExtras()");
         login = intent.getStringExtra(Consts.USER_LOGIN);
         password = intent.getStringExtra(Consts.USER_PASSWORD);
         startServiceVariant = intent.getIntExtra(Consts.START_SERVICE_VARIANT, Consts.AUTOSTART);
-        Log.d(TAG, "login = " + login + " password = " + password);
     }
 
     protected void getUserDataFromPreferences(){
@@ -155,7 +149,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void createSession(final String login, final String password) {
-        Log.d(TAG, "createSession()");
         if (!TextUtils.isEmpty(login) && !TextUtils.isEmpty(password)) {
             final QBUser user = new QBUser(login, password);
             QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
@@ -212,7 +205,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             });
         } else {
             sendResultToActivity(false);
-//            Toast.makeText(IncomeCallListenerService.this, "Login is empty and password is empty", Toast.LENGTH_SHORT).show();
             stopForeground(true);
             stopService(new Intent(getApplicationContext(), IncomeCallListenerService.class));
         }
@@ -232,9 +224,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         ed.putString(Consts.USER_LOGIN, login);
         ed.putString(Consts.USER_PASSWORD, password);
         ed.commit();
-
-        Log.d(TAG, "login = " + sharedPreferences.getString(Consts.USER_LOGIN, null)
-                + " password = " + sharedPreferences.getString(Consts.USER_PASSWORD, null));
     }
 
     private void startOpponentsActivity(){
@@ -258,12 +247,13 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onDestroy() {
-
         QBRTCClient.getInstance().close(true);
-        Log.d(TAG, "QBRTCClient.isInitiated() - " + QBRTCClient.isInitiated());
-        QBChatService.getInstance().destroy();
+        try {
+            QBChatService.getInstance().logout();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
         SessionManager.setCurrentSession(null);
-        Log.d(TAG, "QBChatService.isInitialized() - " + QBChatService.isInitialized());
         super.onDestroy();
     }
 
@@ -283,7 +273,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {
-        Log.d(TAG, "onReceiveNewSession");
         if (SessionManager.getCurrentSession() == null){
             SessionManager.setCurrentSession(qbrtcSession);
             CallActivity.start(this,

@@ -107,7 +107,6 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
             mActionBar.setCustomView(mCustomView);
             mActionBar.setDisplayShowCustomEnabled(true);
         }
-
     }
 
     public void initActionBarWithTimer() {

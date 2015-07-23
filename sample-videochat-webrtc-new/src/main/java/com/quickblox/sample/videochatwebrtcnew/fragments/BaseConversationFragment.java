@@ -99,9 +99,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
             callerID = session.getCallerID();
             callerName = DataHolder.getUserNameByID(session.getCallerID());
             qbConferenceType = session.getConferenceType();
-            Log.d(TAG, "currentSession == null - " + String.valueOf(session == null));
-            Log.d(TAG, "opponents.size() - " + opponents.size());
-            Log.d(TAG, "currentSession != null - " + qbConferenceType);
         }
     }
 
@@ -120,8 +117,6 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
     @Override
     public void onStart() {
-        Log.d(TAG, "onStart()");
-
         getActivity().registerReceiver(audioStreamReceiver, intentFilter);
 
         super.onStart();
@@ -140,13 +135,11 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate() from " + TAG);
         super.onCreate(savedInstanceState);
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
         intentFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
-
         audioStreamReceiver = new AudioStreamReceiver();
     }
 
@@ -174,13 +167,10 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         handUpVideoCall.setOnClickListener(this);
 
         noVideoImageContainer = (LinearLayout) view.findViewById(R.id.noVideoImageContainer);
-
-        Log.d(TAG, "initViews() from " + TAG);
     }
 
     @Override
     public void onStop() {
-        Log.d(TAG, "onStop()");
         super.onStop();
         getActivity().unregisterReceiver(audioStreamReceiver);
     }

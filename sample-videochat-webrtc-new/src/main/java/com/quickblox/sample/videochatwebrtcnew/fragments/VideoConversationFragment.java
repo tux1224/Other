@@ -104,8 +104,6 @@ public class VideoConversationFragment extends BaseConversationFragment implemen
         cameraToggle.setActivated(enability);
         switchCameraToggle.setActivated(enability);
         imgMyCameraOff.setActivated(enability);
-
-
     }
 
     private void toggleCamera(boolean isNeedEnableCam) {
@@ -171,7 +169,6 @@ public class VideoConversationFragment extends BaseConversationFragment implemen
                         public void run() {
                         }
                     });
-                    Log.d(TAG, "Camera was switched!");
                 }
                 break;
             case R.id.cameraToggle:

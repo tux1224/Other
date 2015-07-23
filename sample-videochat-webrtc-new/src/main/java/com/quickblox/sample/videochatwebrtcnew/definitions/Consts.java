@@ -29,7 +29,7 @@ public class Consts {
     public final static int RESULT_CODE_2 = 2;
     public final static int RESULT_CODE_3 = 3;
 
-    //Start srvice variant
+    //Start service variant
     public final static String START_SERVICE_VARIANT = "start_service_variant";
     public final static int AUTOSTART = 1004;
     public final static int RELOGIN = 1005;
@@ -49,6 +49,14 @@ public class Consts {
     //CALL ACTIVITY CLOSE REASONS
     public static final int CALL_ACTIVITY_CLOSE_WIFI_DISABLED = 1001;
     public static final String WIFI_DISABLED = "wifi_disabled";
+
+    public static final String CALLER_NAME = "caller_name";
+    public static final String SESSION_ID = "sessionID";
+    public static final String START_CONVERSATION_REASON = "start_conversation_reason";
+    private static final String ADD_OPPONENTS_FRAGMENT_HANDLER = "opponentHandlerTask";
+    private static final long TIME_BEGORE_CLOSE_CONVERSATION_FRAGMENT = 3;
+    private static final String INCOME_WINDOW_SHOW_TASK_THREAD = "INCOME_WINDOW_SHOW";
+    public static final String OPPONENTS_CALL_FRAGMENT = "opponents_call_fragment";
     public static final String OPPONENTS_LIST_EXTRAS = "opponents_list";
     public static final String CALL_DIRECTION_TYPE_EXTRAS = "call_direction_type";
     public static final String CALL_TYPE_EXTRAS = "call_type";

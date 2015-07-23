@@ -74,9 +74,7 @@ public class DataHolder {
 
 
     public static String getUserNameByID(Integer callerID) {
-//        Log.d(TAG, "callerID " + callerID);
         for (User user : getUsersList()) {
-//            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return user.getFullName();
             }
@@ -85,9 +83,7 @@ public class DataHolder {
     }
 
     public static String getUserNameByLogin(String login) {
-//        Log.d(TAG, "callerID " + callerID);
         for (User user : getUsersList()) {
-//            Log.d(TAG, "getFullName " + user.getId());
             if (user.getLogin().equals(login)) {
                 return user.getFullName();
             }
@@ -96,9 +92,7 @@ public class DataHolder {
     }
 
     public static User getUserByID(Integer callerID) {
-//        Log.d(TAG, "callerID " + callerID);
         for (User user : getUsersList()) {
-//            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return user;
             }
@@ -107,9 +101,7 @@ public class DataHolder {
     }
 
     public static int getUserIndexByID(Integer callerID) {
-//        Log.d(TAG, "callerID " + callerID);
         for (User user : getUsersList()) {
-//            Log.d(TAG, "getFullName " + user.getId());
             if (user.getId().equals(callerID)) {
                 return usersList.indexOf(user);
             }
@@ -118,9 +110,7 @@ public class DataHolder {
     }
 
     public static int getUserIndexByFullName(String fullName) {
-//        Log.d(TAG, "callerID " + fullName);
         for (User user : getUsersList()) {
-//            Log.d(TAG, "getFullName " + user.getFullName());
             if (user.getFullName().equals(fullName)) {
                 return usersList.indexOf(user);
             }
