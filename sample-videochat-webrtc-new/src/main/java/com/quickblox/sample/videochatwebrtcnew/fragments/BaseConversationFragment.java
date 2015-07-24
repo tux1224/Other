@@ -83,11 +83,11 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         ((CallActivity) getActivity()).initActionBarWithTimer();
 
         if (getArguments() != null) {
-            initCallData();
             startReason = getArguments().getInt(Consts.CALL_DIRECTION_TYPE_EXTRAS);
             Log.d(TAG, "CALLER_NAME: " + startReason);
 
         }
+        initCallData();
         initViews(view);
         return view;
     }
@@ -202,7 +202,8 @@ public abstract class BaseConversationFragment extends Fragment implements View.
                 handUpVideoCall.setEnabled(false);
                 Log.d(TAG, "Call is stopped");
 
-                ((CallActivity) getActivity()).delayedHungUpCurrentSession();
+//                ((CallActivity) getActivity()).delayedHungUpCurrentSession();
+                ((CallActivity) getActivity()).hangUpCurrentSession();
                 handUpVideoCall.setEnabled(false);
                 handUpVideoCall.setActivated(false);
                 break;

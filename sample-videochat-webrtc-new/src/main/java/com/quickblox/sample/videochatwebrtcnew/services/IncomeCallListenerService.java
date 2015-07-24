@@ -111,6 +111,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void initQBRTCClient() {
+        Log.d(TAG, "initQBRTCClient()");
         try {
             QBChatService.getInstance().startAutoSendPresence(60);
         } catch (SmackException.NotLoggedInException e) {
@@ -219,6 +220,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void saveUserDataToPreferences(String login, String password){
+        Log.d(TAG, "saveUserDataToPreferences()");
         SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor ed = sharedPreferences.edit();
         ed.putString(Consts.USER_LOGIN, login);
@@ -227,6 +229,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void startOpponentsActivity(){
+        Log.d(TAG, "startOpponentsActivity()");
         if (startServiceVariant != Consts.AUTOSTART) {
             Intent intent = new Intent(IncomeCallListenerService.this, OpponentsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -235,6 +238,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void sendResultToActivity (boolean isSuccess){
+        Log.d(TAG, "startOpponentsActivity()");
         if (startServiceVariant == Consts.LOGIN) {
             try {
                 Intent intent = new Intent().putExtra(Consts.LOGIN_RESULT, isSuccess);
