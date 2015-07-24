@@ -121,7 +121,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
         super.onStart();
         QBRTCSession session = SessionManager.getCurrentSession();
-        if (!isMessageProcessed /*&& session != null*/) {
+        if (!isMessageProcessed && session != null) {
             if (startReason == Consts.CALL_DIRECTION_TYPE.INCOMING.ordinal()) {
                 Log.d(TAG, "acceptCall() from " + TAG);
                 session.acceptCall(session.getUserInfo());
