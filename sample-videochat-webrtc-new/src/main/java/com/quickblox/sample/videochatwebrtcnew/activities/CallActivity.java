@@ -67,6 +67,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     private QBRTCTypes.QBConferenceType call_type;
     private List<Integer> opponentsList;
     private MediaPlayer ringtone;
+    private long startUpTime;
 
     public static void start(Context context, QBRTCTypes.QBConferenceType qbConferenceType,
                              List<Integer> opponentsIds, Map<String, String> userInfo,
@@ -202,6 +203,33 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         finish();
     }
 
+    private Runnable initDelayedHungUp(){
+        Runnable mMyRunnable = new Runnable() {
+            @Override
+            public void run() {
+//                Log.d(TAG, "delayedHungUpCurrentSession()");
+                hangUpCurrentSession();
+            }
+        };
+        return mMyRunnable;
+    }
+
+    private void startDelayedHungUp(long timeOut ){
+        Handler myHandler = new Handler(Looper.myLooper());
+        myHandler.postAtTime(initDelayedHungUp(), SystemClock.uptimeMillis() + timeOut);
+    }
+
+    public void delayedHungUpCurrentSession(){
+
+        long i = System.currentTimeMillis() - startUpTime;
+        if (i > Consts.HUNG_UP_TIME_OUT) {
+            hangUpCurrentSession();
+        } else {
+            startDelayedHungUp(Consts.HUNG_UP_TIME_OUT - i);
+            showToast(R.string.hung_up_processing);
+        }
+    }
+
     private void startIncomeCallTimer() {
         showIncomingCallWindowTaskHandler.postAtTime(showIncomingCallWindowTask, SystemClock.uptimeMillis() + TimeUnit.SECONDS.toMillis(QBRTCConfig.getAnswerTimeInterval()));
     }
@@ -216,6 +244,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     @Override
     protected void onStart() {
         super.onStart();
+        startUpTime = System.currentTimeMillis();
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -457,6 +486,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment, INCOME_CALL_FRAGMENT).commit();
         } else {
             Log.d(TAG, "SKIP addIncomeCallFragment method");
+            finish();
         }
     }
 
@@ -513,7 +543,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         if (SessionManager.getCurrentSession() != null){
             if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_ACTIVE) {
                 hangUpCurrentSession();
-            } else {
+            } else  if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_NEW){
                 rejectCurrentSession();
             }
         }

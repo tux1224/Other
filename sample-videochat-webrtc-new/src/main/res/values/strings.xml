@@ -15,6 +15,7 @@
     <string name="checking">Checking...</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
+    <string name="hung_up_processing">Hang up call command are processing ...</string>
 
 
     <string name="welcoming_message">Login as any user on this deviсe and another(s) users on another device</string>

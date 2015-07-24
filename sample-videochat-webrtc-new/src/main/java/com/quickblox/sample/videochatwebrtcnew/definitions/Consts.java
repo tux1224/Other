@@ -45,6 +45,7 @@ public class Consts {
     public static final String USER_PASSWORD = "user_password";
     public static final String USER_IS_LOGINED = "is_logined";
     public static final long ANSWER_TIME_INTERVAL = 45l;
+    public static final long HUNG_UP_TIME_OUT = 3000l;
 
     //CALL ACTIVITY CLOSE REASONS
     public static final int CALL_ACTIVITY_CLOSE_WIFI_DISABLED = 1001;

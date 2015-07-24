@@ -202,7 +202,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
                 handUpVideoCall.setEnabled(false);
                 Log.d(TAG, "Call is stopped");
 
-                ((CallActivity) getActivity()).hangUpCurrentSession();
+                ((CallActivity) getActivity()).delayedHungUpCurrentSession();
                 handUpVideoCall.setEnabled(false);
                 handUpVideoCall.setActivated(false);
                 break;
