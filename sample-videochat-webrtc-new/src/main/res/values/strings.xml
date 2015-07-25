@@ -34,6 +34,7 @@
 
     <string name="processes_login">Login ...</string>
     <string name="wait_until_login_finish">Wait until login finish</string>
+    <string name="processes_relogin">Relogin ...</string>
 
     
     <string name="btn_audio_call">AUDIO CALL</string>
@@ -48,6 +49,8 @@
     <string name="failed">Failed</string>
     <string name="WIFI_DISABLED">Call was stoped because connection was lost</string>
     <string name="NETWORK_ABSENT">Connection lost</string>
+    <string name="internet_not_connected">Internet is not connected, check you Internet connection and try again</string>
+    <string name="ok_button">OK</string>
     
     <string name="quit_dialog_title">Exit</string>
     <string name="quit_dialog_message">Press \"Minimize\" to minimize the application or the \"Exit with log out\" to log out and exit from the app</string>

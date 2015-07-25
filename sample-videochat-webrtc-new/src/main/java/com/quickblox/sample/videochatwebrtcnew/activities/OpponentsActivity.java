@@ -1,9 +1,10 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.util.Log;
@@ -44,6 +45,7 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
     private ProgressDialog progressDialog;
     private ListView opponentsListView;
     private ArrayList<QBUser> opponentsList;
+    private boolean isWifiConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,8 +170,15 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
             userInfo.put("any_custom_data", "some data");
             userInfo.put("my_avatar_url", "avatar_reference");
 
-            CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
-                    userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
+            Log.d(TAG, "QBChatService.getInstance().isLoggedIn() = " + String.valueOf(QBChatService.getInstance().isLoggedIn()));
+
+            if (isWifiConnected && QBChatService.getInstance().isLoggedIn()) {
+                CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
+                        userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
+            } else {
+                showToast(R.string.internet_not_connected);
+                setActionButtonsClickable(true);
+            }
 
         } else if (opponentsAdapter.getSelected().size() > 1){
             Toast.makeText(this, getString(R.string.only_peer_to_peer_calls), Toast.LENGTH_LONG).show();
@@ -261,33 +270,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         minimizeApp();
     }
 
-    private void showQuitDialog() {
-        AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
-        quitDialog.setTitle(R.string.quit_dialog_title);
-        quitDialog.setMessage(R.string.quit_dialog_message);
-
-        quitDialog.setPositiveButton(R.string.positive_response, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                OpponentsAdapter.i = 0;
-                stopIncomeCallListenerService();
-                clearUserDataFromPreferences();
-                startListUsersActivity();
-                finish();
-                minimizeApp();
-            }
-        });
-
-        quitDialog.setNegativeButton(R.string.negative_response, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                minimizeApp();
-            }
-        });
-
-        quitDialog.show();
-    }
-
     private void showLogOutDialog(){
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
         quitDialog.setTitle(R.string.log_out_dialog_title);
@@ -311,5 +293,56 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         });
 
         quitDialog.show();
+    }
+
+    @Override
+    void processCurrentWifiState(Context context) {
+        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()) {
+            Log.d(TAG, "WIFI is turned off");
+            isWifiConnected = false;
+//            initConnectionErrorDialog();
+        } else {
+            Log.d(TAG, "WIFI is turned on");
+            isWifiConnected = true;
+        }
+    }
+
+    private void initReloginProgressDialog() {
+        progressDialog = new ProgressDialog(this) {
+            @Override
+            public void onBackPressed() {
+                Toast.makeText(OpponentsActivity.this, getString(R.string.wait_until_login_finish), Toast.LENGTH_SHORT).show();
+            }
+        };
+        progressDialog.setMessage(getString(R.string.processes_relogin));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog(boolean isLoginSuccess) {
+        if (progressDialog != null){
+            progressDialog.dismiss();
+            if (isLoginSuccess) {
+                finish();
+            }
+        }
+    }
+
+    private void initConnectionErrorDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(OpponentsActivity.this);
+        builder.setMessage(R.string.NETWORK_ABSENT)
+                .setCancelable(false)
+                .setNegativeButton(R.string.ok_button,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+//                                finish();
+//                                startListUsersActivity();
+                                setActionButtonsClickable(false);
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

@@ -77,7 +77,9 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         intent.putExtra(Consts.CALL_TYPE_EXTRAS, qbConferenceType);
         intent.putExtra(Consts.USER_INFO_EXTRAS, (Serializable) userInfo);
         intent.putExtra(Consts.OPPONENTS_LIST_EXTRAS, (Serializable) opponentsIds);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (callDirectionType == Consts.CALL_DIRECTION_TYPE.INCOMING) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         context.startActivity(intent);
     }
 
@@ -86,7 +88,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initQBRTCConnectionListener();
-        initWiFiManagerListener();
+//        initWiFiManagerListener();
 
         if (getIntent().getExtras() != null) {
             parseIntentExtras(getIntent().getExtras());
@@ -127,17 +129,18 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         QBRTCClient.getInstance().addConnectionCallbacksListener(this);
     }
 
-    private void initWiFiManagerListener() {
-        wifiStateReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "WIFI was changed");
-                processCurrentWifiState(context);
-            }
-        };
-    }
+//    private void initWiFiManagerListener() {
+//        wifiStateReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                Log.d(TAG, "WIFI was changed");
+//                processCurrentWifiState(context);
+//            }
+//        };
+//    }
 
-    protected void processCurrentWifiState(Context context) {
+    @Override
+    void processCurrentWifiState(Context context) {
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (!wifi.isWifiEnabled()) {
             Log.d(TAG, "WIFI is turned off");
@@ -155,9 +158,11 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     finish();
                 }
             } else {
-                Log.d(TAG, "WIFI is turned on");
-                showToast(R.string.NETWORK_ABSENT);
+//                hangUpCurrentSession();
             }
+        } else {
+            Log.d(TAG, "WIFI is turned on");
+//            showToast(R.string.NETWORK_ABSENT);
         }
     }
 
@@ -246,9 +251,9 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         super.onStart();
         startUpTime = System.currentTimeMillis();
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiStateReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+//        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     @Override
@@ -265,7 +270,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     protected void onStop() {
         super.onStop();
         stopOutBeep();
-        unregisterReceiver(wifiStateReceiver);
+//        unregisterReceiver(wifiStateReceiver);
     }
 
     private void forbidenCloseByWifiState() {
@@ -324,9 +329,9 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                 if (hangUpReason != null && hangUpReason.equals(Consts.WIFI_DISABLED)) {
                     Intent returnIntent = new Intent();
                     setResult(Consts.CALL_ACTIVITY_CLOSE_WIFI_DISABLED, returnIntent);
-//                    finish();
+                    finish();
                 }
-                finish();
+//                finish();
             }
         });
     }
@@ -402,7 +407,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                     SessionManager.setCurrentSession(null);
 
                     Log.d(TAG, "Stop session");
-                    finish();
+//                    finish();
 
 
 
@@ -437,14 +442,14 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         });
     }
 
-    private void showToast(final int message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void showToast(final int message) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
 //    private void setStateTitle(final Integer userID, final int stringID, final int progressBarVisibility) {
 //        runOnUiThread(new Runnable() {
@@ -547,6 +552,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
                 rejectCurrentSession();
             }
         }
+        SessionManager.setCurrentSession(null);
     }
 
     private void removeActivityAsCallbackToRTCClient() {

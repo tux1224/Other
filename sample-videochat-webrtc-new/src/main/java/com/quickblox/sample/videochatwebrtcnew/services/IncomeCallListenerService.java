@@ -4,9 +4,12 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -54,11 +57,14 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     private String password;
     private PendingIntent pendingIntent;
     private int startServiceVariant;
+    private BroadcastReceiver wifiStateReceiver;
+    private boolean needMaintainConnectivity;
 
     @Override
     public void onCreate() {
         super.onCreate();
         QBSettings.getInstance().fastConfigInit(Consts.APP_ID, Consts.AUTH_KEY, Consts.AUTH_SECRET);
+        initWiFiManagerListener();
     }
 
     @Override
@@ -66,7 +72,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         Log.d(TAG, "Service started");
 
         if (!QBChatService.isInitialized()) {
-            QBChatService.init(this);
+            QBChatService.init(getApplicationContext());
         }
 
         chatService = QBChatService.getInstance();
@@ -81,7 +87,14 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
         if(!QBChatService.getInstance().isLoggedIn()){
             createSession(login, password);
+        } else {
+            startActionsOnSuccessLogin(login, password);
         }
+
+        initWiFiManagerListener();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -134,7 +147,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         QBRTCClient.getInstance().addSessionCallbacksListener(this);
 
         // Start mange QBRTCSessions according to VideoCall parser's callbacks
-        QBRTCClient.getInstance().prepareToProcessCalls(this);
+        QBRTCClient.getInstance().prepareToProcessCalls(getApplicationContext());
     }
 
     private void parseIntentExtras(Intent intent) {
@@ -217,6 +230,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         startOpponentsActivity();
         startForeground(Consts.NOTIFICATION_FORAGROUND, createNotification());
         saveUserDataToPreferences(login, password);
+        needMaintainConnectivity = true;
     }
 
     private void saveUserDataToPreferences(String login, String password){
@@ -238,7 +252,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void sendResultToActivity (boolean isSuccess){
-        Log.d(TAG, "startOpponentsActivity()");
+        Log.d(TAG, "sendResultToActivity()");
         if (startServiceVariant == Consts.LOGIN) {
             try {
                 Intent intent = new Intent().putExtra(Consts.LOGIN_RESULT, isSuccess);
@@ -271,6 +285,82 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         super.onTaskRemoved(rootIntent);
     }
 
+
+    private void initWiFiManagerListener() {
+        wifiStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "WIFI was changed");
+                processCurrentWifiState(context);
+            }
+        };
+    }
+
+    private void processCurrentWifiState(Context context) {
+        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()) {
+            Log.d(TAG, "WIFI is turned off");
+        } else {
+            if (needMaintainConnectivity) {
+                Log.d(TAG, "WIFI is turned on");
+                if (!QBChatService.isInitialized()) {
+                    QBChatService.init(getApplicationContext());
+                }
+                chatService = QBChatService.getInstance();
+                if (!QBChatService.getInstance().isLoggedIn()) {
+                    SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+                    String login = sharedPreferences.getString(Consts.USER_LOGIN, null);
+                    String password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
+                    reloginToChat(login, password);
+                }
+            }
+        }
+    }
+
+    private void reloginToChat(String login, String password) {
+        final QBUser user = new QBUser(login, password);
+        QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
+            @Override
+            public void onSuccess(QBSession session, Bundle bundle) {
+                Log.d(TAG, "onSuccess create session with params");
+                user.setId(session.getUserId());
+                chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
+
+                    @Override
+                    public void onSuccess(QBUser result, Bundle params) {
+                        Log.d(TAG, "onSuccess login to chat with params");
+
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "onSuccess login to chat");
+                    }
+
+                    @Override
+                    public void onError(List errors) {
+                        Toast.makeText(IncomeCallListenerService.this, "Error when login", Toast.LENGTH_SHORT).show();
+                        for (Object error : errors) {
+                            Log.d(TAG, error.toString());
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess() {
+                super.onSuccess();
+                Log.d(TAG, "onSuccess create session");
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+                for (String s : errors) {
+                    Log.d(TAG, s);
+                }
+            }
+        });
+    }
 
 
     //========== Implement methods ==========//

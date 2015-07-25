@@ -84,7 +84,7 @@ public abstract class BaseConversationFragment extends Fragment implements View.
 
         if (getArguments() != null) {
             startReason = getArguments().getInt(Consts.CALL_DIRECTION_TYPE_EXTRAS);
-            Log.d(TAG, "CALLER_NAME: " + startReason);
+            Log.d(TAG, "startReason: " + startReason);
 
         }
         initCallData();
@@ -151,13 +151,12 @@ public abstract class BaseConversationFragment extends Fragment implements View.
         micToggleVideoCall = (ToggleButton) view.findViewById(R.id.micToggleVideoCall);
         micToggleVideoCall.setOnClickListener(this);
 
+        opponentNameView = (TextView) view.findViewById(R.id.incUserName);
         if (startReason == Consts.CALL_DIRECTION_TYPE.OUTGOING.ordinal()) {
-            opponentNameView = (TextView) view.findViewById(R.id.incUserName);
             opponentNameView.setText(DataHolder.getUserNameByID(opponents.get(0)));
             opponentNameView.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
                     DataHolder.getUserIndexByID(opponents.get(0))) + 1));
         } else if (startReason == Consts.CALL_DIRECTION_TYPE.INCOMING.ordinal())  {
-            opponentNameView = (TextView) view.findViewById(R.id.incUserName);
             opponentNameView.setText(DataHolder.getUserNameByID(callerID));
             opponentNameView.setBackgroundResource(BaseLogginedUserActivity.selectBackgrounForOpponent((
                     DataHolder.getUserIndexByID(callerID)) + 1));

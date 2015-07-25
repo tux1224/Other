@@ -48,10 +48,12 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
     private String login;
     private String password;
     protected NotificationManager notificationManager;
+    private BroadcastReceiver wifiStateReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initWiFiManagerListener();
 
         if (QBChatService.isInitialized()) {
             if (QBChatService.getInstance().isLoggedIn()) {
@@ -67,6 +69,10 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     public void initActionBar() {
@@ -270,6 +276,16 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void showToast(final int message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     protected void getUserDataFromPreferences(){
         SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         login = sharedPreferences.getString(Consts.USER_LOGIN, null);
@@ -313,8 +329,23 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
         startActivity(startMain);
     }
 
+    private void initWiFiManagerListener() {
+        wifiStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "WIFI was changed");
+                processCurrentWifiState(context);
+            }
+        };
+    }
+
+    abstract void processCurrentWifiState(Context context);
+
     @Override
     protected void onDestroy() {
+        if (wifiStateReceiver != null) {
+            unregisterReceiver(wifiStateReceiver);
+        }
         super.onDestroy();
     }
 }

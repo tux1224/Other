@@ -1,8 +1,11 @@
 package com.quickblox.sample.videochatwebrtcnew.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -31,6 +34,7 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     private ListView usersList;
     private static ArrayList<User> users = DataHolder.getUsersList();
     private ProgressDialog progressDialog;
+    private boolean isWifiConnected;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +63,15 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
 
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String login = usersListAdapter.getItem(position).getLogin();
-                String password = usersListAdapter.getItem(position).getPassword();
-                initProgressDialog();
-                startIncomeCallListenerService(login, password, Consts.LOGIN);
+                if (isWifiConnected) {
+                    String login = usersListAdapter.getItem(position).getLogin();
+                    String password = usersListAdapter.getItem(position).getPassword();
+                    initProgressDialog();
+                    startIncomeCallListenerService(login, password, Consts.LOGIN);
+                }else {
+                    showToast(R.string.internet_not_connected);
+                }
+
             }
         });
     }
@@ -96,6 +105,19 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    void processCurrentWifiState(Context context) {
+        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (!wifi.isWifiEnabled()) {
+            isWifiConnected = false;
+            Log.d(TAG, "WIFI is turned off");
+        } else {
+            isWifiConnected = true;
+            Log.d(TAG, "WIFI is turned on");
+//            showToast(R.string.NETWORK_ABSENT);
+        }
     }
 
     @Override
