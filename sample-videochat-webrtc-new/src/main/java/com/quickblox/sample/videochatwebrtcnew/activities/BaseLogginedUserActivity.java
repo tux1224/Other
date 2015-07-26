@@ -69,10 +69,6 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     public void initActionBar() {
@@ -286,10 +282,24 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
     }
 
 
-    protected void getUserDataFromPreferences(){
+    protected String [] getUserDataFromPreferences(){
+        String [] userData = new String[2];
         SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         login = sharedPreferences.getString(Consts.USER_LOGIN, null);
         password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
+
+        userData[0] = login;
+        userData[1] = password;
+
+        return userData;
+    }
+
+    protected boolean isUserDataEmpty(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Consts.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        login = sharedPreferences.getString(Consts.USER_LOGIN, null);
+        password = sharedPreferences.getString(Consts.USER_PASSWORD, null);
+
+        return TextUtils.isEmpty(login) && TextUtils.isEmpty(password);
     }
 
     protected void saveUserDataToPreferences(String login, String password){
@@ -337,6 +347,10 @@ public abstract class BaseLogginedUserActivity extends AppCompatActivity {
                 processCurrentWifiState(context);
             }
         };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     abstract void processCurrentWifiState(Context context);
