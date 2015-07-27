@@ -91,11 +91,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             startActionsOnSuccessLogin(login, password);
         }
 
-        initWiFiManagerListener();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiStateReceiver, intentFilter);
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -272,6 +267,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             e.printStackTrace();
         }
         SessionManager.setCurrentSession(null);
+
+        if (wifiStateReceiver != null){
+            unregisterReceiver(wifiStateReceiver);
+        }
         super.onDestroy();
     }
 
@@ -294,6 +293,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                 processCurrentWifiState(context);
             }
         };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     private void processCurrentWifiState(Context context) {
@@ -329,7 +332,6 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
                     @Override
                     public void onSuccess(QBUser result, Bundle params) {
                         Log.d(TAG, "onSuccess login to chat with params");
-
                     }
 
                     @Override
