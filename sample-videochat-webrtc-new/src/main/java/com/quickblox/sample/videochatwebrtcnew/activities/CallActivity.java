@@ -68,6 +68,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     private List<Integer> opponentsList;
     private MediaPlayer ringtone;
     private long startUpTime;
+    private BroadcastReceiver callBroadcasrReceiver;
 
     public static void start(Context context, QBRTCTypes.QBConferenceType qbConferenceType,
                              List<Integer> opponentsIds, Map<String, String> userInfo,
@@ -575,6 +576,21 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
     @Override
     public void onBackPressed() {
+    }
+
+    private void registerCallbackListener(){
+        callBroadcasrReceiver = new BroadcastReceiver() {
+
+            public void onReceive(Context context, Intent intent) {
+                intent.getAction();
+
+                }
+
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Consts.CALL_RESULT);
+        registerReceiver(callBroadcasrReceiver, intentFilter);
     }
 }
 

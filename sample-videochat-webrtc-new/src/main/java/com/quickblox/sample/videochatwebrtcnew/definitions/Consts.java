@@ -1,5 +1,11 @@
 package com.quickblox.sample.videochatwebrtcnew.definitions;
 
+import com.quickblox.videochat.webrtc.QBRTCException;
+import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+
+import java.util.Map;
+
 public class Consts {
     public static final String APP_ID = "92";
     public static final String AUTH_KEY = "wJHdOcQSxXQGWx5";
@@ -25,15 +31,40 @@ public class Consts {
     public static final int CALL_ACTIVITY_CLOSE = 1000;
     public final static int LOGIN_TASK_CODE = 1002;
     public final static int LOGIN_RESULT_CODE = 1003;
+
+    public final static int CALL_TASK_CODE = 1009;
+    public final static int CALL_RESULT_CODE = 1010;
+    public final static String CALL_RESULT = "call_result";
+    public final static String CALL_ACTION_VALUE = "call_action_value";
+
+
+    public final static String RECEIVE_NEW_SESSION = "onReceiveNewSession";
+    public final static String USER_NOT_ANSWER = "user_not_answer";
+    public final static String CALL_REJECT_BY_USER = "call_reject_by_user";
+    public final static String RECEIVE_HANG_UP_FROM_USER = "receive_hang_up_from_user";
+    public final static String SESSION_CLOSED = "session_closed";
+    public final static String SESSION_START_CLOSE = "session_start_close";
+
+    public final static String START_CONNECT_TO_USER = "start_connect_to_user";
+    public final static String CONNECTED_TO_USER = "connected_to_user";
+    public final static String CONNECTION_CLOSED_FOR_USER = "connection_closed_for_user";
+    public final static String DISCONNECTED_FROM_USER = "disconnected_from_user";
+    public final static String DISCONNECTED_TIMEOUT_FROM_USER = "disconnected_timeout_from_user";
+    public final static String CONNECTION_FAILED_WITH_USER = "connection_failed_with_user";
+    public final static String ERROR = "error";
+
+    public final static String LOCAL_VIDEO_TRACK_RECEIVE = "local_video_track_receive";
+    public final static String REMOTE_VIDEO_TRACK_RECEIVE = "remote_video_track_receive";
+
     public final static int RESULT_CODE_1 = 1;
     public final static int RESULT_CODE_2 = 2;
     public final static int RESULT_CODE_3 = 3;
 
     //Start service variant
     public final static String START_SERVICE_VARIANT = "start_service_variant";
-    public final static int AUTOSTART = 1004;
-    public final static int RELOGIN = 1005;
-    public final static int LOGIN = 1006;
+    public final static int AUTOSTART = 1006;
+    public final static int RELOGIN = 1007;
+    public final static int LOGIN = 1008;
 
 
 

@@ -365,7 +365,10 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     }
 
     private void sendBroadcastMessages(String callbackAction){
-
+        Intent intent = new Intent();
+        intent.setAction(Consts.CALL_RESULT);
+        intent.putExtra(Consts.CALL_ACTION_VALUE, callbackAction);
+        sendBroadcast(intent);
     }
 
 
