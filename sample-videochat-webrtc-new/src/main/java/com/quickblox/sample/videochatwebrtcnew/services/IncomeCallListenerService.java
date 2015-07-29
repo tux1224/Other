@@ -36,12 +36,15 @@ import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCConfig;
+import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Message;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +52,7 @@ import java.util.Map;
 /**
  * Created by tereha on 08.07.15.
  */
-public class IncomeCallListenerService extends Service implements QBRTCClientSessionCallbacks {
+public class IncomeCallListenerService extends Service implements QBRTCClientSessionCallbacks, QBRTCClientConnectionCallbacks {
 
     private static final String TAG = IncomeCallListenerService.class.getSimpleName();
     private QBChatService chatService;
@@ -364,10 +367,14 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
         });
     }
 
-    private void sendBroadcastMessages(String callbackAction){
+    private void sendBroadcastMessages(int callbackAction, Integer usedID,
+                                       Map<String, String> userInfo, QBRTCException exception){
         Intent intent = new Intent();
         intent.setAction(Consts.CALL_RESULT);
         intent.putExtra(Consts.CALL_ACTION_VALUE, callbackAction);
+        intent.putExtra(Consts.USER_ID, usedID);
+        intent.putExtra(Consts.USER_INFO_EXTRAS, (Serializable) userInfo);
+        intent.putExtra(Consts.QB_EXCEPTION_EXTRAS, exception);
         sendBroadcast(intent);
     }
 
@@ -390,28 +397,66 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onUserNotAnswer(QBRTCSession qbrtcSession, Integer integer) {
-
+        sendBroadcastMessages(Consts.USER_NOT_ANSWER, integer, null, null);
     }
 
     @Override
     public void onCallRejectByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
-
+        sendBroadcastMessages(Consts.CALL_REJECT_BY_USER, integer, map, null);
     }
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
-
+        if (qbrtcSession.equals(SessionManager.getCurrentSession())) {
+            sendBroadcastMessages(Consts.RECEIVE_HANG_UP_FROM_USER, integer, null, null);
+        }
     }
 
     @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
         if (qbrtcSession.equals(SessionManager.getCurrentSession())) {
+            sendBroadcastMessages(Consts.SESSION_CLOSED, null, null, null);
             SessionManager.setCurrentSession(null);
         }
     }
 
     @Override
     public void onSessionStartClose(QBRTCSession qbrtcSession) {
+        sendBroadcastMessages(Consts.SESSION_START_CLOSE, null, null, null);
+    }
 
+    @Override
+    public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.START_CONNECT_TO_USER, integer, null, null);
+    }
+
+    @Override
+    public void onConnectedToUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.CONNECTED_TO_USER, integer, null, null);
+    }
+
+    @Override
+    public void onConnectionClosedForUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.CONNECTION_CLOSED_FOR_USER, integer, null, null);
+    }
+
+    @Override
+    public void onDisconnectedFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.DISCONNECTED_FROM_USER, integer, null, null);
+    }
+
+    @Override
+    public void onDisconnectedTimeoutFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.DISCONNECTED_TIMEOUT_FROM_USER, integer, null, null);
+    }
+
+    @Override
+    public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
+        sendBroadcastMessages(Consts.CONNECTION_FAILED_WITH_USER, integer, null, null);
+    }
+
+    @Override
+    public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
+        sendBroadcastMessages(Consts.ERROR, null, null, null);
     }
 }

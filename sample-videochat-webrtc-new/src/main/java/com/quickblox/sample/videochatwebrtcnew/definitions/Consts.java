@@ -38,23 +38,23 @@ public class Consts {
     public final static String CALL_ACTION_VALUE = "call_action_value";
 
 
-    public final static String RECEIVE_NEW_SESSION = "onReceiveNewSession";
-    public final static String USER_NOT_ANSWER = "user_not_answer";
-    public final static String CALL_REJECT_BY_USER = "call_reject_by_user";
-    public final static String RECEIVE_HANG_UP_FROM_USER = "receive_hang_up_from_user";
-    public final static String SESSION_CLOSED = "session_closed";
-    public final static String SESSION_START_CLOSE = "session_start_close";
+    public final static int RECEIVE_NEW_SESSION = 11110;
+    public final static int USER_NOT_ANSWER = 11111;
+    public final static int CALL_REJECT_BY_USER = 11112;
+    public final static int RECEIVE_HANG_UP_FROM_USER = 11113;
+    public final static int SESSION_CLOSED = 11114;
+    public final static int SESSION_START_CLOSE = 11115;
 
-    public final static String START_CONNECT_TO_USER = "start_connect_to_user";
-    public final static String CONNECTED_TO_USER = "connected_to_user";
-    public final static String CONNECTION_CLOSED_FOR_USER = "connection_closed_for_user";
-    public final static String DISCONNECTED_FROM_USER = "disconnected_from_user";
-    public final static String DISCONNECTED_TIMEOUT_FROM_USER = "disconnected_timeout_from_user";
-    public final static String CONNECTION_FAILED_WITH_USER = "connection_failed_with_user";
-    public final static String ERROR = "error";
+    public final static int START_CONNECT_TO_USER = 22220;
+    public final static int CONNECTED_TO_USER = 22221;
+    public final static int CONNECTION_CLOSED_FOR_USER = 22222;
+    public final static int DISCONNECTED_FROM_USER = 22223;
+    public final static int DISCONNECTED_TIMEOUT_FROM_USER = 22224;
+    public final static int CONNECTION_FAILED_WITH_USER = 22225;
+    public final static int ERROR = 22226;
 
-    public final static String LOCAL_VIDEO_TRACK_RECEIVE = "local_video_track_receive";
-    public final static String REMOTE_VIDEO_TRACK_RECEIVE = "remote_video_track_receive";
+    public final static int LOCAL_VIDEO_TRACK_RECEIVE = 33330;
+    public final static int REMOTE_VIDEO_TRACK_RECEIVE = 33331;
 
     public final static int RESULT_CODE_1 = 1;
     public final static int RESULT_CODE_2 = 2;
@@ -74,6 +74,8 @@ public class Consts {
     //Shared Preferences constants
     public static final String USER_LOGIN = "user_login";
     public static final String USER_PASSWORD = "user_password";
+    public static final String USER_ID = "user_id";
+
     public static final String USER_IS_LOGINED = "is_logined";
     public static final long ANSWER_TIME_INTERVAL = 45l;
     public static final long HUNG_UP_TIME_OUT = 3000l;
@@ -96,6 +98,7 @@ public class Consts {
     public static final String USER_INFO_EXTRAS = "user_info";
     public static final String IS_SERVICE_AUTOSTARTED = "autostart";
     public static final String SHARED_PREFERENCES = "preferences";
+    public static final String QB_EXCEPTION_EXTRAS = "exception";
 
     public enum CALL_DIRECTION_TYPE {
         INCOMING,
