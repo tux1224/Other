@@ -65,6 +65,7 @@ public class CallActivity extends BaseLogginedUserActivity{
     private MediaPlayer ringtone;
     private long startUpTime;
     private BroadcastReceiver callBroadcastReceiver;
+    private boolean isWifiConnected;
 
     public static void start(Context context, QBRTCTypes.QBConferenceType qbConferenceType,
                              List<Integer> opponentsIds, Map<String, String> userInfo,
@@ -110,6 +111,7 @@ public class CallActivity extends BaseLogginedUserActivity{
     void processCurrentWifiState(Context context) {
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (!wifi.isWifiEnabled()) {
+            isWifiConnected = false;
             Log.d(TAG, "WIFI is turned off");
             if (closeByWifiStateAllow) {
                 if (SessionManager.getCurrentSession() != null) {
@@ -117,6 +119,7 @@ public class CallActivity extends BaseLogginedUserActivity{
                     // Close session safely
                     disableConversationFragmentButtons();
                     stopOutBeep();
+
                     hangUpCurrentSession();
 
                     hangUpReason = Consts.WIFI_DISABLED;
@@ -124,9 +127,12 @@ public class CallActivity extends BaseLogginedUserActivity{
                     Log.d(TAG, "Call finish() on activity");
                     finish();
                 }
+            } else {
+//                showToast(R.string.NETWORK_ABSENT);
             }
         } else {
             Log.d(TAG, "WIFI is turned on");
+            isWifiConnected = true;
         }
     }
 
@@ -257,7 +263,6 @@ public class CallActivity extends BaseLogginedUserActivity{
                     setResult(Consts.CALL_ACTIVITY_CLOSE_WIFI_DISABLED, returnIntent);
                     finish();
                 }
-//                finish();
             }
         });
     }
@@ -325,7 +330,11 @@ public class CallActivity extends BaseLogginedUserActivity{
 
                     stopTimer();
                     closeByWifiStateAllow = true;
-                processCurrentWifiState(CallActivity.this);
+                if (!isWifiConnected) {
+                    processCurrentWifiState(CallActivity.this);
+                } else {
+                    finish();
+                }
             }
         });
     }

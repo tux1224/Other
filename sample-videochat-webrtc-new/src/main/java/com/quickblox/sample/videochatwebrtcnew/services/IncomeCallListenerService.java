@@ -427,7 +427,7 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
     public void onSessionClosed(QBRTCSession qbrtcSession) {
         if (qbrtcSession.equals(SessionManager.getCurrentSession())) {
             sendBroadcastMessages(Consts.SESSION_CLOSED, null, null, null);
-            SessionManager.setCurrentSession(null);
+//            SessionManager.setCurrentSession(null);
         }
     }
 
