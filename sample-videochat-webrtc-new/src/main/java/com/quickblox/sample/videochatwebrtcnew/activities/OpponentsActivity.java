@@ -308,27 +308,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
         }
     }
 
-    private void initReloginProgressDialog() {
-        progressDialog = new ProgressDialog(this) {
-            @Override
-            public void onBackPressed() {
-                Toast.makeText(OpponentsActivity.this, getString(R.string.wait_until_login_finish), Toast.LENGTH_SHORT).show();
-            }
-        };
-        progressDialog.setMessage(getString(R.string.processes_relogin));
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
-    }
-
-    private void hideProgressDialog(boolean isLoginSuccess) {
-        if (progressDialog != null){
-            progressDialog.dismiss();
-            if (isLoginSuccess) {
-                finish();
-            }
-        }
-    }
-
     private void initConnectionErrorDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(OpponentsActivity.this);
         builder.setMessage(R.string.NETWORK_ABSENT)
@@ -337,8 +316,6 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-//                                finish();
-//                                startListUsersActivity();
                                 setActionButtonsClickable(false);
                             }
                         });

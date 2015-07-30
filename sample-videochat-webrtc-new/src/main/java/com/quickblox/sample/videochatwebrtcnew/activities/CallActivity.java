@@ -31,10 +31,6 @@ import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
-
-import org.webrtc.VideoCapturerAndroid;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,7 +64,7 @@ public class CallActivity extends BaseLogginedUserActivity{
     private List<Integer> opponentsList;
     private MediaPlayer ringtone;
     private long startUpTime;
-    private BroadcastReceiver callBroadcasrReceiver;
+    private BroadcastReceiver callBroadcastReceiver;
 
     public static void start(Context context, QBRTCTypes.QBConferenceType qbConferenceType,
                              List<Integer> opponentsIds, Map<String, String> userInfo,
@@ -89,8 +85,6 @@ public class CallActivity extends BaseLogginedUserActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerCallbackListener();
-        initQBRTCConnectionListener();
-//        initWiFiManagerListener();
 
         if (getIntent().getExtras() != null) {
             parseIntentExtras(getIntent().getExtras());
@@ -112,35 +106,6 @@ public class CallActivity extends BaseLogginedUserActivity{
         opponentsList = (List<Integer>) extras.getSerializable(Consts.OPPONENTS_LIST_EXTRAS);
     }
 
-    private void initQBRTCConnectionListener() {
-
-        QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
-            @Override
-            public void onCameraError(final String s) {
-                CallActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(CallActivity.this, s, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
-
-        // Add activity as callback to RTCClient
-//        QBRTCClient.getInstance().addSessionCallbacksListener(this);
-//        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-    }
-
-//    private void initWiFiManagerListener() {
-//        wifiStateReceiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                Log.d(TAG, "WIFI was changed");
-//                processCurrentWifiState(context);
-//            }
-//        };
-//    }
-
     @Override
     void processCurrentWifiState(Context context) {
         WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -159,12 +124,9 @@ public class CallActivity extends BaseLogginedUserActivity{
                     Log.d(TAG, "Call finish() on activity");
                     finish();
                 }
-            } else {
-//                hangUpCurrentSession();
             }
         } else {
             Log.d(TAG, "WIFI is turned on");
-//            showToast(R.string.NETWORK_ABSENT);
         }
     }
 
@@ -210,33 +172,6 @@ public class CallActivity extends BaseLogginedUserActivity{
         finish();
     }
 
-    private Runnable initDelayedHungUp(){
-        Runnable mMyRunnable = new Runnable() {
-            @Override
-            public void run() {
-//                Log.d(TAG, "delayedHungUpCurrentSession()");
-                hangUpCurrentSession();
-            }
-        };
-        return mMyRunnable;
-    }
-
-    private void startDelayedHungUp(long timeOut ){
-        Handler myHandler = new Handler(Looper.myLooper());
-        myHandler.postAtTime(initDelayedHungUp(), SystemClock.uptimeMillis() + timeOut);
-    }
-
-    public void delayedHungUpCurrentSession(){
-
-        long i = System.currentTimeMillis() - startUpTime;
-        if (i > Consts.HUNG_UP_TIME_OUT) {
-            hangUpCurrentSession();
-        } else {
-            startDelayedHungUp(Consts.HUNG_UP_TIME_OUT - i);
-            showToast(R.string.hung_up_processing);
-        }
-    }
-
     private void startIncomeCallTimer() {
         showIncomingCallWindowTaskHandler.postAtTime(showIncomingCallWindowTask, SystemClock.uptimeMillis() + TimeUnit.SECONDS.toMillis(QBRTCConfig.getAnswerTimeInterval()));
     }
@@ -251,11 +186,6 @@ public class CallActivity extends BaseLogginedUserActivity{
     @Override
     protected void onStart() {
         super.onStart();
-        startUpTime = System.currentTimeMillis();
-
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-//        registerReceiver(wifiStateReceiver, intentFilter);
     }
 
     @Override
@@ -272,7 +202,6 @@ public class CallActivity extends BaseLogginedUserActivity{
     protected void onStop() {
         super.onStop();
         stopOutBeep();
-//        unregisterReceiver(wifiStateReceiver);
     }
 
     private void forbidenCloseByWifiState() {
@@ -305,7 +234,7 @@ public class CallActivity extends BaseLogginedUserActivity{
         });
     }
 
-    public void onCallRejectByUser (Integer userID/*, Map<String, String> userInfo*/) {
+    public void onCallRejectByUser (Integer userID, Map<String, String> userInfo) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -378,19 +307,13 @@ public class CallActivity extends BaseLogginedUserActivity{
         });
     }
 
-    public void onError(/*QBRTCException e*/) {
+    public void onError(QBRTCException e) {
     }
 
     public void onSessionClosed() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Log.d(TAG, "Session " + session.getSessionID() + " start stop session");
-                String curSession = (SessionManager.getCurrentSession() == null) ? null : SessionManager.getCurrentSession().getSessionID();
-                Log.d(TAG, "Session " + curSession + " is current" );
-
-//                if (session.equals(SessionManager.getCurrentSession())) {
-
                     if (isInCommingCall) {
                         stopIncomeCallTimer();
                         Log.d(TAG, "isInCommingCall - " + isInCommingCall);
@@ -399,14 +322,10 @@ public class CallActivity extends BaseLogginedUserActivity{
                     SessionManager.setCurrentSession(null);
 
                     Log.d(TAG, "Stop session");
-//                    finish();
-
-
 
                     stopTimer();
                     closeByWifiStateAllow = true;
                 processCurrentWifiState(CallActivity.this);
-//                }
             }
         });
     }
@@ -432,15 +351,6 @@ public class CallActivity extends BaseLogginedUserActivity{
         });
     }
 
-//    private void showToast(final int message) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Toast.makeText(getApplicationContext(), getString(message), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
 //    private void setStateTitle(final Integer userID, final int stringID, final int progressBarVisibility) {
 //        runOnUiThread(new Runnable() {
 //            @Override
@@ -459,7 +369,6 @@ public class CallActivity extends BaseLogginedUserActivity{
 //    }
 
     public void onReceiveHangUpFromUser(final Integer userID) {
-//        if (session.equals(SessionManager.getCurrentSession())) {
             // TODO update view of this user
             runOnUiThread(new Runnable() {
                 @Override
@@ -469,7 +378,6 @@ public class CallActivity extends BaseLogginedUserActivity{
                 }
             });
             finish();
-//        }
     }
 
     private void addIncomeCallFragment(QBRTCSession session) {
@@ -533,22 +441,16 @@ public class CallActivity extends BaseLogginedUserActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        removeActivityAsCallbackToRTCClient();
-        if (SessionManager.getCurrentSession() != null){
-            if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_ACTIVE) {
-                hangUpCurrentSession();
-            } else  if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_NEW){
-                rejectCurrentSession();
+        if (!closeByWifiStateAllow) {
+            if (SessionManager.getCurrentSession() != null) {
+                if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_ACTIVE) {
+                    hangUpCurrentSession();
+                } else if (SessionManager.getCurrentSession().getState() == QBRTCSession.QBRTCSessionState.QB_RTC_SESSION_NEW) {
+                    rejectCurrentSession();
+                }
             }
         }
-        SessionManager.setCurrentSession(null);
-        unregisterReceiver(callBroadcasrReceiver);
-    }
-
-    private void removeActivityAsCallbackToRTCClient() {
-        // Remove activity as callback from RTCClient
-//        QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
-//        QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
+        unregisterReceiver(callBroadcastReceiver);
     }
 
     @Override
@@ -568,7 +470,7 @@ public class CallActivity extends BaseLogginedUserActivity{
     }
 
     private void registerCallbackListener(){
-        callBroadcasrReceiver = new BroadcastReceiver() {
+        callBroadcastReceiver = new BroadcastReceiver() {
 
             public void onReceive(Context context, Intent intent) {
 
@@ -576,6 +478,10 @@ public class CallActivity extends BaseLogginedUserActivity{
 
                     int callTask = intent.getIntExtra(Consts.CALL_ACTION_VALUE, 0);
                     final Integer userID = intent.getIntExtra(Consts.USER_ID, 0);
+                    final Map<String, String> userInfo = (Map<String, String>) intent
+                            .getSerializableExtra(Consts.USER_INFO_EXTRAS);
+                    final QBRTCException exception = (QBRTCException) intent
+                            .getSerializableExtra(Consts.QB_EXCEPTION_EXTRAS);
 
                     switch (callTask) {
                         case Consts.RECEIVE_NEW_SESSION:
@@ -585,7 +491,7 @@ public class CallActivity extends BaseLogginedUserActivity{
                             onUserNotAnswer(userID);
                             break;
                         case Consts.CALL_REJECT_BY_USER:
-                            onCallRejectByUser(userID);
+                            onCallRejectByUser(userID, userInfo);
                             break;
                         case Consts.RECEIVE_HANG_UP_FROM_USER:
                             onReceiveHangUpFromUser(userID);
@@ -615,7 +521,7 @@ public class CallActivity extends BaseLogginedUserActivity{
                             onConnectionFailedWithUser(userID);
                             break;
                         case Consts.ERROR:
-                            onError();
+                            onError(exception);
                             break;
                     }
                 }
@@ -625,7 +531,7 @@ public class CallActivity extends BaseLogginedUserActivity{
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Consts.CALL_RESULT);
-        registerReceiver(callBroadcasrReceiver, intentFilter);
+        registerReceiver(callBroadcastReceiver, intentFilter);
     }
 }
 

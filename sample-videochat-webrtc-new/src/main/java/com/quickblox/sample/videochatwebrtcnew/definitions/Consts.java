@@ -1,11 +1,5 @@
 package com.quickblox.sample.videochatwebrtcnew.definitions;
 
-import com.quickblox.videochat.webrtc.QBRTCException;
-import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
-
-import java.util.Map;
-
 public class Consts {
     public static final String APP_ID = "92";
     public static final String AUTH_KEY = "wJHdOcQSxXQGWx5";

@@ -116,7 +116,6 @@ public class ListUsersActivity extends BaseLogginedUserActivity {
         } else {
             isWifiConnected = true;
             Log.d(TAG, "WIFI is turned on");
-//            showToast(R.string.NETWORK_ABSENT);
         }
     }
 

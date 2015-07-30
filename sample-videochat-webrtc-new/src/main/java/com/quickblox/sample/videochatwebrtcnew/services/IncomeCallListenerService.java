@@ -43,6 +43,7 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Message;
+import org.webrtc.VideoCapturerAndroid;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -139,10 +140,18 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
             }
         });
 
+        QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
+            @Override
+            public void onCameraError(final String s) {
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         QBRTCConfig.setAnswerTimeInterval(Consts.ANSWER_TIME_INTERVAL);
 
         // Add activity as callback to RTCClient
         QBRTCClient.getInstance().addSessionCallbacksListener(this);
+        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
 
         // Start mange QBRTCSessions according to VideoCall parser's callbacks
         QBRTCClient.getInstance().prepareToProcessCalls(getApplicationContext());
@@ -263,12 +272,14 @@ public class IncomeCallListenerService extends Service implements QBRTCClientSes
 
     @Override
     public void onDestroy() {
-        QBRTCClient.getInstance().close(true);
+//        QBRTCClient.getInstance().close(true);
         try {
             QBChatService.getInstance().logout();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+        QBRTCClient.getInstance().removeSessionsCallbacksListener(this);
+        QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
         SessionManager.setCurrentSession(null);
 
         if (wifiStateReceiver != null){
