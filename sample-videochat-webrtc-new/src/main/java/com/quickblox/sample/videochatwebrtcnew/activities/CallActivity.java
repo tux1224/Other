@@ -123,12 +123,12 @@ public class CallActivity extends BaseLogginedUserActivity{
                     hangUpCurrentSession();
 
                     hangUpReason = Consts.WIFI_DISABLED;
+
+                    finish();
                 } else {
                     Log.d(TAG, "Call finish() on activity");
                     finish();
                 }
-            } else {
-//                showToast(R.string.NETWORK_ABSENT);
             }
         } else {
             Log.d(TAG, "WIFI is turned on");
@@ -330,11 +330,11 @@ public class CallActivity extends BaseLogginedUserActivity{
 
                     stopTimer();
                     closeByWifiStateAllow = true;
-                if (!isWifiConnected) {
-                    processCurrentWifiState(CallActivity.this);
-                } else {
+//                if (!isWifiConnected) {
+//                    processCurrentWifiState(CallActivity.this);
+//                } else {
                     finish();
-                }
+//                }
             }
         });
     }
@@ -459,6 +459,7 @@ public class CallActivity extends BaseLogginedUserActivity{
                 }
             }
         }
+        SessionManager.setCurrentSession(null);
         unregisterReceiver(callBroadcastReceiver);
     }
 
