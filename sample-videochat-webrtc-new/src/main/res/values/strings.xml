@@ -49,7 +49,8 @@
     <string name="failed">Failed</string>
     <string name="WIFI_DISABLED">Call was stoped because connection was lost</string>
     <string name="NETWORK_ABSENT">Connection lost</string>
-    <string name="internet_not_connected">Internet is not connected, check you Internet connection and try again</string>
+    <string name="internet_not_connected">Please check your Internet connection</string>
+    <string name="initializing_in_chat">Initializing in chat, please wait...</string>
     <string name="ok_button">OK</string>
     
     <string name="quit_dialog_title">Exit</string>

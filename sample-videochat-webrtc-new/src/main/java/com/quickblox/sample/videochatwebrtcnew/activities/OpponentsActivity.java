@@ -172,12 +172,15 @@ public class OpponentsActivity extends BaseLogginedUserActivity implements View.
 
             Log.d(TAG, "QBChatService.getInstance().isLoggedIn() = " + String.valueOf(QBChatService.getInstance().isLoggedIn()));
 
-            if (isWifiConnected && QBChatService.getInstance().isLoggedIn()) {
-                CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
-                        userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
-            } else {
+            if (!isWifiConnected){
                 showToast(R.string.internet_not_connected);
                 setActionButtonsClickable(true);
+            } else if (!QBChatService.getInstance().isLoggedIn()){
+                showToast(R.string.initializing_in_chat);
+                setActionButtonsClickable(true);
+            }else if (isWifiConnected && QBChatService.getInstance().isLoggedIn()) {
+                CallActivity.start(this, qbConferenceType, getOpponentsIds(opponentsAdapter.getSelected()),
+                        userInfo, Consts.CALL_DIRECTION_TYPE.OUTGOING);
             }
 
         } else if (opponentsAdapter.getSelected().size() > 1){
