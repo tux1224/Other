@@ -123,8 +123,6 @@ public class CallActivity extends BaseLogginedUserActivity{
                     hangUpCurrentSession();
 
                     hangUpReason = Consts.WIFI_DISABLED;
-
-                    finish();
                 } else {
                     Log.d(TAG, "Call finish() on activity");
                     finish();
