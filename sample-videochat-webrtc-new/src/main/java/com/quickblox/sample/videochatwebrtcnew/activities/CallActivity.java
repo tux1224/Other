@@ -105,7 +105,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
         }
 
         initQBRTCClient();
-        initWiFiManagerListener();
+//        initWiFiManagerListener();
     }
 
     private void initQBRTCClient() {
@@ -145,7 +145,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "WIFI was changed");
-                processCurrentWifiState(context);
+//                processCurrentWifiState(context);
             }
         };
     }
@@ -268,7 +268,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(wifiStateReceiver);
+//        unregisterReceiver(wifiStateReceiver);
     }
 
     public QBRTCSession getCurrentSession() {
@@ -482,7 +482,7 @@ public class CallActivity extends BaseLogginedUserActivity implements QBRTCClien
 
                     stopTimer();
                     closeByWifiStateAllow = true;
-                    processCurrentWifiState(CallActivity.this);
+//                    processCurrentWifiState(CallActivity.this);
                 }
             }
         });
