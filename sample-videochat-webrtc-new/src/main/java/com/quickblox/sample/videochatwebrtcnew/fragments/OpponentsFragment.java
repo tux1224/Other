@@ -183,8 +183,8 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
                     .addConversationFragmentStartCall(getOpponentsIds(opponentsAdapter.getSelected()),
                             qbConferenceType, userInfo);
 
-//        } else if (opponentsAdapter.getSelected().size() > 1){
-//            Toast.makeText(getActivity(), "Only 1-to-1 calls are available", Toast.LENGTH_LONG).show();
+        } else if (opponentsAdapter.getSelected().size() > 1){
+            Toast.makeText(getActivity(), "Only 1-to-1 calls are available", Toast.LENGTH_LONG).show();
         } else if (opponentsAdapter.getSelected().size() < 1){
             Toast.makeText(getActivity(), "Choose one opponent", Toast.LENGTH_LONG).show();
         }
