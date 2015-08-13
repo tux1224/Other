@@ -1,16 +1,16 @@
 package com.quickblox.sample.videochatwebrtcnew.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.quickblox.sample.videochatwebrtcnew.R;
-import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
 import java.util.List;
@@ -20,12 +20,23 @@ import java.util.List;
  */
 public class OpponentsFromCallAdapter extends BaseAdapter {
 
-    private List<QBUser> opponents;
+    private static final int NUM_IN_ROW = 3;
+    private static final String TAG = OpponentsFromCallAdapter.class.getSimpleName();
+    private final int itemHeight;
+    private final int itemWidth;
+
+    private Context context;
+    private List<Integer> opponents;
     private LayoutInflater inflater;
 
-    public OpponentsFromCallAdapter(Context context, List<QBUser> users) {
+
+    public OpponentsFromCallAdapter(Context context, List<Integer> users, GridView gridView) {
+        this.context = context;
         this.opponents = users;
         this.inflater = LayoutInflater.from(context);
+        itemWidth = gridView.getMeasuredWidth() / NUM_IN_ROW;
+        itemHeight = gridView.getMeasuredHeight() / 2;
+        Log.d(TAG, "item width=" + itemWidth + ", item height=" + itemHeight);
     }
 
 
@@ -35,7 +46,7 @@ public class OpponentsFromCallAdapter extends BaseAdapter {
     }
 
     @Override
-    public QBUser getItem(int position) {
+    public Integer getItem(int position) {
         return opponents.get(position);
     }
 
@@ -46,25 +57,11 @@ public class OpponentsFromCallAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder holder;
-
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.list_item_opponents, null);
-            holder = new ViewHolder();
-            holder.opponentsNumber = (TextView) convertView.findViewById(R.id.opponentsNumber);
-
-            convertView.setTag(holder);
-
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        final QBUser user = opponents.get(position);
-        if (user != null) {
-            holder.opponentsNumber.setText("");
-            holder.opponentsNumber.setBackgroundResource(ListUsersActivity.resourceSelector(position));
-        }
-        return convertView;
+        Log.d(TAG, "getView=" + position);
+        QBGLVideoView videoView = new QBGLVideoView(context);
+        videoView.setLayoutParams(new AbsListView.LayoutParams(itemWidth, itemHeight));
+        videoView.setTag(opponents.get(position));
+        return videoView;
     }
 
 

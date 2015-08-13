@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.quickblox.sample.videochatwebrtcnew.R;
@@ -65,7 +65,7 @@ public class OpponentsAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.opponentsNumber = (TextView) convertView.findViewById(R.id.opponentsNumber);
             holder.opponentsName = (TextView) convertView.findViewById(R.id.opponentsName);
-            holder.opponentsRadioButton = (RadioButton) convertView.findViewById(R.id.opponentsCheckBox);
+            holder.opponentsRadioButton = (CheckBox) convertView.findViewById(R.id.opponentsCheckBox);
 
             convertView.setTag(holder);
 
@@ -83,6 +83,10 @@ public class OpponentsAdapter extends BaseAdapter {
             holder.opponentsNumber.setBackgroundResource(ListUsersActivity.resourceSelector
                     (ListUsersActivity.getUserIndex(user.getId())));
             holder.opponentsName.setText(user.getFullName());
+
+            holder.opponentsRadioButton.setOnCheckedChangeListener(null);
+            holder.opponentsRadioButton.setChecked(selected.contains(user));
+
             holder.opponentsRadioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -90,7 +94,6 @@ public class OpponentsAdapter extends BaseAdapter {
                     if (isChecked) {
                         i = user.getId();
                         Log.d(TAG, "Button state:" + isChecked + " i:" + i);
-                        selected.removeAll(selected);
                         selected.add(user);
                         Log.d(TAG, "Selected " + user.getFullName());
                     } else {
@@ -99,17 +102,13 @@ public class OpponentsAdapter extends BaseAdapter {
                         }
                         Log.d(TAG, "Button state:" + isChecked + " i:" + i);
                         selected.remove(user);
-                        holder.opponentsRadioButton.setChecked(false);
-//                        selected.removeAll(selected);
                         Log.d(TAG, "Deselected " + user.getFullName());
                     }
-                    notifyDataSetChanged();
                 }
             });
 
 //            Log.d(TAG, "Method getView. i = " + i + "");
 //            Log.d(TAG, "Method getView. User id" + user.getId() + "");
-            holder.opponentsRadioButton.setChecked(i == user.getId());
 
         }
 
@@ -120,6 +119,6 @@ public class OpponentsAdapter extends BaseAdapter {
     public static class ViewHolder {
         TextView opponentsNumber;
         TextView opponentsName;
-        RadioButton opponentsRadioButton;
+        CheckBox opponentsRadioButton;
     }
 }

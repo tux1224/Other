@@ -13,12 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.quickblox.core.exception.QBResponseException;
@@ -26,6 +27,7 @@ import com.quickblox.sample.videochatwebrtcnew.ApplicationSingleton;
 import com.quickblox.sample.videochatwebrtcnew.R;
 import com.quickblox.sample.videochatwebrtcnew.activities.CallActivity;
 import com.quickblox.sample.videochatwebrtcnew.activities.ListUsersActivity;
+import com.quickblox.sample.videochatwebrtcnew.adapters.OpponentsFromCallAdapter;
 import com.quickblox.sample.videochatwebrtcnew.holder.DataHolder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -77,10 +79,12 @@ public class ConversationFragment extends Fragment implements Serializable {
     private boolean isMessageProcessed;
     private MediaPlayer ringtone;
     private View localVideoView;
-    private View remoteVideoView;
+    private View remoteVideoView1;
+    private View remoteVideoView2;
     private IntentFilter intentFilter;
     private AudioStreamReceiver audioStreamReceiver;
     private CameraState cameraState = CameraState.NONE;
+    private GridView gridView;
 
 
     @Override
@@ -119,7 +123,8 @@ public class ConversationFragment extends Fragment implements Serializable {
             switchCameraToggle.setVisibility(View.INVISIBLE);
 
             localVideoView.setVisibility(View.INVISIBLE);
-            remoteVideoView.setVisibility(View.INVISIBLE);
+            remoteVideoView1.setVisibility(View.INVISIBLE);
+            remoteVideoView2.setVisibility(View.INVISIBLE);
 
             imgMyCameraOff.setVisibility(View.INVISIBLE);
         }
@@ -201,8 +206,17 @@ public class ConversationFragment extends Fragment implements Serializable {
 
 
         localVideoView = view.findViewById(R.id.localVideoVidew);
-        remoteVideoView = view.findViewById(R.id.remoteVideoView);
-
+        /*remoteVideoView1 = view.findViewById(R.id.remoteVideoView1);
+        remoteVideoView2 = view.findViewById(R.id.remoteVideoView1);*/
+        gridView = (GridView) view.findViewById(R.id.grid_opponents);
+        gridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Log.i(TAG, "onGlobalLayout");
+                gridView.setAdapter(new OpponentsFromCallAdapter(getActivity(), opponents, gridView));
+                gridView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            }
+        });
 //        opponentsFromCall = (LinearLayout) view.findViewById(R.id.opponentsFromCall);
 
         cameraToggle = (ToggleButton) view.findViewById(R.id.cameraToggle);
@@ -361,7 +375,6 @@ public class ConversationFragment extends Fragment implements Serializable {
             }
         }
     }
-
 
     public static enum StartConversetionReason {
         INCOME_CALL_FOR_ACCEPTION,

@@ -6,20 +6,21 @@
     android:keepScreenOn="true"
     android:background="@color/white">
 
-
-    <com.quickblox.videochat.webrtc.view.QBGLVideoView
-        android:id="@+id/remoteVideoView"
-        android:layout_width="230dp"
-        android:layout_height="300dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="100dp"/>
-
     <com.quickblox.videochat.webrtc.view.QBGLVideoView
         android:id="@+id/localVideoVidew"
-        android:layout_width="115dp"
-        android:layout_height="150dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentRight="true"/>
 
+    <GridView android:id="@+id/grid_opponents"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:layout_below="@+id/localVideoVidew"
+        android:layout_above="@+id/element_set_video_buttons"
+        android:numColumns="3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </GridView>
 
     <include
         android:id="@+id/element_set_video_buttons"

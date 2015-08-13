@@ -58,6 +58,7 @@ public class ListUsersActivity extends Activity {
             getActionBar().setTitle(getResources().getString(R.string.opponentsListActionBarTitle));
         }
 
+        QBChatService.setDebugEnabled(true);
         if (!QBChatService.isInitialized()) {
             QBChatService.init(this);
             chatService = QBChatService.getInstance();

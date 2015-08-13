@@ -23,6 +23,7 @@ import com.quickblox.sample.videochatwebrtcnew.adapters.OpponentsAdapter;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import org.jivesoftware.smack.SmackException;
@@ -160,7 +161,15 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View v) {
 
-        if (opponentsAdapter.getSelected().size() == 1) {
+        if (opponentsAdapter.getSelected().isEmpty()){
+            Toast.makeText(getActivity(), "Choose one opponent", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (opponentsAdapter.getSelected().size() > QBRTCConfig.getMaxOpponentsCount()){
+            Toast.makeText(getActivity(), "Max number of opponents is 6", Toast.LENGTH_LONG).show();
+            return;
+        }
             QBRTCTypes.QBConferenceType qbConferenceType = null;
 
             //Init conference type
@@ -183,11 +192,6 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
                     .addConversationFragmentStartCall(getOpponentsIds(opponentsAdapter.getSelected()),
                             qbConferenceType, userInfo);
 
-//        } else if (opponentsAdapter.getSelected().size() > 1){
-//            Toast.makeText(getActivity(), "Only 1-to-1 calls are available", Toast.LENGTH_LONG).show();
-        } else if (opponentsAdapter.getSelected().size() < 1){
-            Toast.makeText(getActivity(), "Choose one opponent", Toast.LENGTH_LONG).show();
-        }
     }
 
     public static ArrayList<Integer> getOpponentsIds(List<QBUser> opponents){
@@ -201,11 +205,6 @@ public class OpponentsFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
-
-        if (OpponentsAdapter.i > 0){
-            opponentsList.setSelection(OpponentsAdapter.i);
-
-        }
     }
 
     @Override
