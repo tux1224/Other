@@ -13,7 +13,6 @@ public class User extends QBUser {
         super.id = id;
         this.userNumber = userNumber;
     }
-
     public int getUserNumber() {
         return userNumber;
     }
